@@ -17,5 +17,5 @@ then
 fi
 
 echo "starting process..."
-python $DIR/src/main.py &
+python $DIR/src/main.py > execution.log 2>&1 &
 exit 0
