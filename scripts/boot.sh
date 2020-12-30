@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DIR="$(dirname $(dirname $(realpath $0)))"
+cd $DIR
 
 if [[ ! -e "$DIR/.virtualenv" ]];
 then
