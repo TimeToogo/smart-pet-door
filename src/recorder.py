@@ -65,7 +65,7 @@ def start_recorder(queue = None, debug = False):
 
         if compare_frame is None or (time() - compare_frame_time > config.MD_MAX_DURATION_S * 2 and state == "STILL"):
             compare_frame = gray
-            compare_frate_time = time()
+            compare_frame_time = time()
             continue
 
         frameDelta = cv2.absdiff(compare_frame, gray)
@@ -98,7 +98,7 @@ def start_recorder(queue = None, debug = False):
         stillness_duration = time() - last_motion_at if last_motion_at else 0
 
         def end_motion():
-            nonlocal state, state_change_at, compare_frame, compare_frate_time, video, video_path
+            nonlocal state, state_change_at, compare_frame, compare_frame_time, video, video_path
             video_path = end_video(video, video_path)
 
             if queue is not None:
@@ -107,7 +107,7 @@ def start_recorder(queue = None, debug = False):
             state = "STILL"
             state_change_at = time()
             compare_frame = gray
-            compare_frate_time = time()
+            compare_frame_time = time()
             video = None
             video_path = None
 
