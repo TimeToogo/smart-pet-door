@@ -8,7 +8,7 @@ import cv2
 import numpy as np
 import os
 
-def start_recorder(queue = None):
+def start_recorder(queue = None, debug = False):
     vs = VideoStream(src=0, resolution=config.MD_RESOLUTION).start()
     sleep(2.0)
 
@@ -85,7 +85,7 @@ def start_recorder(queue = None):
             if cv2.contourArea(c) < config.MD_MIN_AREA:
                 continue
 
-            if config.MD_DEBUG:
+            if debug:
                 # compute the bounding box for the contour, draw it on the frame,
                 # and update the text
                 (x, y, w, h) = cv2.boundingRect(c)
@@ -137,7 +137,7 @@ def start_recorder(queue = None):
         sleep(1 / (config.MD_STILL_FPS if state == "STILL" else config.MD_MOTION_FPS))
         prev_frame = orig_frame
 
-        if config.MD_DEBUG:
+        if debug:
             # draw the text and timestamp on the frame
             cv2.putText(frame, "Room Status: {}".format(state), (10, 20),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
@@ -159,4 +159,4 @@ def start_recorder(queue = None):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    start_recorder()
+    start_recorder(debug=True)

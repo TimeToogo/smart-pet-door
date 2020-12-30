@@ -13,7 +13,6 @@ class State:
 
 class Config:
     # Motion Detection (MD) config
-    MD_DEBUG = True
     MD_MIN_AREA = 500
     MD_RESIZE_WIDTH = 240
     MD_RESOLUTION = (640, 480)

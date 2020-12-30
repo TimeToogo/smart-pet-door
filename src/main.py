@@ -3,6 +3,7 @@ from time import sleep
 import signal
 import sys
 import os
+import subprocess
 
 from config import config, State
 
@@ -56,7 +57,10 @@ def start():
     elif state.value == State.UPDATING:
         config.logger.info('found update, restarting process...')
         wait_for_procs()
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        print([sys.executable] + sys.argv)
+        subprocess.Popen([sys.executable] + sys.argv)
+        config.logger.info('terminating...')
+        sys.exit(0)
 
 def keep_alive(name, state, function, args):
     def manage_proc(name, state, function, args):
