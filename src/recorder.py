@@ -14,7 +14,6 @@ def start_recorder(queue = None, debug = False):
 
     prev_frame = None
     compare_frame = None
-    compare_frame_time = time()
 
     state = "STILL"
     state_change_at = None
@@ -63,9 +62,8 @@ def start_recorder(queue = None, debug = False):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
-        if compare_frame is None or (time() - compare_frame_time > config.MD_MAX_DURATION_S * 2 and state == "STILL"):
+        if compare_frame is None:
             compare_frame = gray
-            compare_frame_time = time()
             continue
 
         frameDelta = cv2.absdiff(compare_frame, gray)
@@ -98,7 +96,7 @@ def start_recorder(queue = None, debug = False):
         stillness_duration = time() - last_motion_at if last_motion_at else 0
 
         def end_motion():
-            nonlocal state, state_change_at, compare_frame, compare_frame_time, video, video_path
+            nonlocal state, state_change_at, compare_frame, video, video_path
             video_path = end_video(video, video_path)
 
             if queue is not None:
@@ -106,8 +104,6 @@ def start_recorder(queue = None, debug = False):
 
             state = "STILL"
             state_change_at = time()
-            compare_frame = gray
-            compare_frame_time = time()
             video = None
             video_path = None
 
@@ -136,6 +132,7 @@ def start_recorder(queue = None, debug = False):
         # sleep until next frame at desired FPS
         sleep(1 / (config.MD_STILL_FPS if state == "STILL" else config.MD_MOTION_FPS))
         prev_frame = orig_frame
+        compare_frame = gray
 
         if debug:
             # draw the text and timestamp on the frame
