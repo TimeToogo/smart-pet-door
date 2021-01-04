@@ -9,15 +9,17 @@ import cv2
 import numpy as np
 import os
 import astral.sun
+from sys import platform
 
 def start_recorder(queue = None, debug = False):
-    vs = VideoStream(src=0, resolution=config.MD_RESOLUTION, usePiCamera=True)
+    vs = VideoStream(src=0, resolution=config.MD_RESOLUTION, usePiCamera='linux' in platform)
     vs_stream = vs.start()
 
     sleep(2.0)
 
     prev_frame = None
     compare_frame = None
+    last_compare_frame_at = None
 
     state = "STILL"
     state_change_at = None
@@ -62,11 +64,13 @@ def start_recorder(queue = None, debug = False):
             return config.MD_NIGHT_BRIGHTNESS
 
     # set initial brightness and sleep to avoid brightness flicker triggering motion detection
-    vs.stream.camera.brightness = calc_brightness()
+    if hasattr(vs.stream, 'camera'):
+        vs.stream.camera.brightness = calc_brightness()
     sleep(0.5)
 
     while True:
-        vs.stream.camera.brightness = calc_brightness()
+        if hasattr(vs.stream, 'camera'):
+            vs.stream.camera.brightness = calc_brightness()
 
         # grab the current frame and initialize the occupied/unoccupied
         # text
@@ -86,6 +90,7 @@ def start_recorder(queue = None, debug = False):
 
         if compare_frame is None:
             compare_frame = gray
+            last_compare_frame_at = time()
             continue
 
         frameDelta = cv2.absdiff(compare_frame, gray)
@@ -152,9 +157,19 @@ def start_recorder(queue = None, debug = False):
             write_frame_to_video(video, orig_frame)
 
         # sleep until next frame at desired FPS
+        # todo: this is not really tracking at the right fps since it does not account
+        # for processing time of each frame but is good for keeping a consistent cpu usage
+        # which helps with temperature management, this can be improved to calculate the time
+        # until the next frame and potentially slow if temp rises beyond a threshold 
         sleep(1 / (config.MD_STILL_FPS if state == "STILL" else config.MD_MOTION_FPS))
+
+        # keep previous frame for writing to video if motion occurs
         prev_frame = orig_frame
-        compare_frame = gray
+
+        # use latest motion frame to compare with next frame
+        if detected_motion or time() - last_compare_frame_at > 60:
+            compare_frame = gray
+            last_compare_frame_at = time()
 
         if debug:
             # draw the text and timestamp on the frame
