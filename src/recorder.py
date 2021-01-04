@@ -66,7 +66,7 @@ def start_recorder(queue = None, debug = False):
     # set initial brightness and sleep to avoid brightness flicker triggering motion detection
     if hasattr(vs.stream, 'camera'):
         vs.stream.camera.brightness = calc_brightness()
-    sleep(0.5)
+        sleep(0.5)
 
     while True:
         if hasattr(vs.stream, 'camera'):
