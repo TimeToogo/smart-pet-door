@@ -57,7 +57,6 @@ def start():
     elif state.value == State.UPDATING:
         config.logger.info('found update, restarting process...')
         wait_for_procs()
-        print([sys.executable] + sys.argv)
         subprocess.Popen([sys.executable] + sys.argv)
         config.logger.info('terminating...')
         sys.exit(0)
