@@ -2,14 +2,18 @@ from config import config
 
 from imutils.video import VideoStream
 import datetime
+import pytz
 import imutils
 from time import sleep, time
 import cv2
 import numpy as np
 import os
+import astral.sun
 
 def start_recorder(queue = None, debug = False):
-    vs = VideoStream(src=0, resolution=config.MD_RESOLUTION).start()
+    vs = VideoStream(src=0, resolution=config.MD_RESOLUTION, usePiCamera=True)
+    vs_stream = vs.start()
+
     sleep(2.0)
 
     prev_frame = None
@@ -43,12 +47,30 @@ def start_recorder(queue = None, debug = False):
         os.remove(video_path)
         return mp4_path
 
-    # loop over the frames of the video
+    def calc_brightness(cache = {}):
+        now = datetime.datetime.now(pytz.UTC)
+        
+        if 'day' not in cache or cache['day'] != now.date():
+            cache['day'] = now.date()
+            cache['sunrise'] = astral.sun.sunrise(config.MD_LOCATION_INFO.observer)
+            cache['sunset'] = astral.sun.sunset(config.MD_LOCATION_INFO.observer)
+            config.logger.info('calculated sunrise and sunset: ' + str(cache))
+
+        if now > cache['sunrise'] and now < cache['sunset']:
+            return config.MD_DAY_BRIGHTNESS
+        else:
+            return config.MD_NIGHT_BRIGHTNESS
+
+    # set initial brightness and sleep to avoid brightness flicker triggering motion detection
+    vs.stream.camera.brightness = calc_brightness()
+    sleep(0.5)
+
     while True:
+        vs.stream.camera.brightness = calc_brightness()
+
         # grab the current frame and initialize the occupied/unoccupied
         # text
-        frame = vs.read()
-        frame = frame
+        frame = vs_stream.read()
 
         # if the frame could not be grabbed, then we have reached the end
         # of the video
@@ -67,7 +89,7 @@ def start_recorder(queue = None, debug = False):
             continue
 
         frameDelta = cv2.absdiff(compare_frame, gray)
-        thresh = cv2.threshold(frameDelta, 25, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.threshold(frameDelta, 50, 255, cv2.THRESH_BINARY)[1]
 
         # dilate the thresholded image to fill in holes, then find contours
         # on thresholded image
@@ -152,7 +174,7 @@ def start_recorder(queue = None, debug = False):
                 break
 
     # cleanup the camera and close any open windows
-    vs.stop()
+    vs_stream.stop()
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':

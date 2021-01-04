@@ -1,5 +1,6 @@
 import logging
 import os
+from astral.geocoder import lookup, database
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -13,7 +14,7 @@ class State:
 
 class Config:
     # Motion Detection (MD) config
-    MD_MIN_AREA = 500
+    MD_MIN_AREA = 100
     MD_RESIZE_WIDTH = 240
     MD_RESOLUTION = (640, 480)
     MD_MIN_DURATION_S = 5
@@ -22,6 +23,9 @@ class Config:
     MD_MOTION_FPS = 10
     MD_STORAGE_PATH = "data/video"
     MD_STORAGE_MAX_AGE = 30 * 24 * 3600
+    MD_DAY_BRIGHTNESS = 50
+    MD_NIGHT_BRIGHTNESS = 65
+    MD_LOCATION_INFO = lookup("Melbourne", database())
 
     # Auto Updater (AD) config
     AD_INTERVAL_S = 5 * 60
