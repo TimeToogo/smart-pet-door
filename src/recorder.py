@@ -50,12 +50,12 @@ def start_recorder(queue = None, debug = False):
         return mp4_path
 
     def calc_brightness(cache = {}):
-        now = datetime.datetime.now(pytz.UTC)
+        now = datetime.datetime.now(config.MD_LOCATION_INFO.tzinfo)
         
         if 'day' not in cache or cache['day'] != now.date():
             cache['day'] = now.date()
-            cache['sunrise'] = astral.sun.sunrise(config.MD_LOCATION_INFO.observer)
-            cache['sunset'] = astral.sun.sunset(config.MD_LOCATION_INFO.observer)
+            cache['sunrise'] = astral.sun.sunrise(config.MD_LOCATION_INFO.observer, tzinfo=config.MD_LOCATION_INFO.tzinfo)
+            cache['sunset'] = astral.sun.sunset(config.MD_LOCATION_INFO.observer, tzinfo=config.MD_LOCATION_INFO.tzinfo)
             config.logger.info('calculated sunrise and sunset: ' + str(cache))
 
         if now > cache['sunrise'] and now < cache['sunset']:
