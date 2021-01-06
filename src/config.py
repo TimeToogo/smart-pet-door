@@ -30,6 +30,9 @@ class Config:
     # Auto Updater (AD) config
     AD_INTERVAL_S = 5 * 60
 
+    # API
+    API_BIND = "0.0.0.0:8080"
+
     def __init__(self):
         self.logger = logging.getLogger('smartpetdoor')
 
