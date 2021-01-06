@@ -44,7 +44,7 @@ def start_recorder(queue = None, debug = False):
         video.release()
         mp4_path = video_path.replace('.avi', '.mp4')
         config.logger.info('finished writing to video')
-        os.system('ffmpeg -hide_banner -loglevel error -i %s -vcodec libx264 %s -movflags +faststart' % (video_path, mp4_path))
+        os.system('ffmpeg -hide_banner -loglevel error -i %s -vcodec libx264 -movflags +faststart %s' % (video_path, mp4_path))
         config.logger.info('finished converting video to mp4 at %s' % mp4_path)
         os.remove(video_path)
         return mp4_path
