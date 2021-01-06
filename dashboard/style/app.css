@@ -3,6 +3,9 @@
 @import "container.css";
 @import "section.css";
 @import "timeline.css";
+@import "latestSightings.css";
+@import "inVsOut.css";
+@import "frequencies.css";
 @import "modal.css";
 
 :root {

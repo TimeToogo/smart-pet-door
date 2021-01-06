@@ -1,0 +1,31 @@
+.sightings .content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  padding-bottom: 4rem;
+  flex-wrap: wrap;
+}
+
+.sightings .content .sighting {
+  flex: 0 0 1;
+  margin: 1.5rem 3rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+}
+
+.sightings h3 {
+  color: var(--white);
+  font-size: 30px;
+  line-height: 30px;
+  text-align: center;
+}
+
+.sightings video {
+  width: 100%;
+  border-radius: 10px;
+  border: 7px solid var(--white);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+}

@@ -1,6 +1,9 @@
 import api from "./api.js";
 import timeline from "./timeline.js";
-import modal from "./modal.js"
+import latestSightings from "./latestSightings.js";
+import inVsOut from "./inVsOut.js";
+import frequencies from "./frequencies.js";
+import modal from "./modal.js";
 
 const init = async () => {
   console.log("initialising app...");
@@ -11,7 +14,10 @@ const init = async () => {
   );
 
   timeline.init(cfg, events);
-  modal.init(cfg)
+  latestSightings.init(cfg, events);
+  inVsOut.init(cfg, events);
+  frequencies.init(cfg, events);
+  modal.init(cfg);
 };
 
 init();

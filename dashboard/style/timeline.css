@@ -50,7 +50,7 @@
   background-position: center;
   border-radius: 99px;
   border: 7px solid var(--white);
-  box-shadow: 5px 5px 0 #5360a7;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
   margin-bottom: 1rem;
 }
 

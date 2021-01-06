@@ -1,4 +1,3 @@
-import Modal from "./modal.js";
 import render from "./render.js";
 import timeago from "./timeago.js";
 import modal from "./modal.js";
@@ -59,7 +58,7 @@ export default class Timeline {
         return `${names} ${is} in a fight!`;
 
       case cfg.events.TOILET:
-        return `${names} ${is} made a stinky!`;
+        return `${names} made a stinky!`;
 
       default:
         console.log(`Unknown event type`, e);
