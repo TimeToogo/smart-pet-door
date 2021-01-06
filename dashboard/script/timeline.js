@@ -39,7 +39,7 @@ export default class Timeline {
         ? pets[0]
         : pets.slice(0, -1).join(", ") + " & " + pets[pets.length - 1];
 
-    const is = pets.length === 1 ? "is" : "are";
+    const was = pets.length === 1 ? "was" : "were";
 
     switch (e.event) {
       case cfg.events.SIGHTING:
@@ -52,10 +52,10 @@ export default class Timeline {
         return `${names} went outside.`;
 
       case cfg.events.HUNT:
-        return `${names} ${is} on the hunt!`;
+        return `${names} ${was} on the hunt!`;
 
       case cfg.events.FIGHT:
-        return `${names} ${is} in a fight!`;
+        return `${names} ${was} in a fight!`;
 
       case cfg.events.TOILET:
         return `${names} made a stinky!`;
