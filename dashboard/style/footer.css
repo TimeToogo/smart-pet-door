@@ -1,0 +1,10 @@
+.main-footer {
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.main-footer p {
+    color: var(--white);
+    white-space: nowrap;
+}

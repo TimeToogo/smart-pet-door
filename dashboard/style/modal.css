@@ -1,0 +1,81 @@
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem;
+  z-index: 11;
+}
+
+.modal .dialog {
+  position: relative;
+  padding: 2rem;
+  background: var(--white);
+  border-radius: 12px;
+  width: 100%;
+  height: auto;
+  max-width: 700px;
+  min-width: 300px;
+  margin: auto;
+  box-shadow: 8px 8px 0 var(--shadow);
+  z-index: 11;
+}
+
+.modal.active {
+  display: flex;
+  justify-content: center;
+  align-self: center;
+}
+
+.modal .background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modal .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: var(--white);
+  background: rgb(76, 175, 241);
+  border-radius: 99px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 30px;
+  line-height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(50%, -50%);
+}
+
+.modal header {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.modal header .title {
+  font-size: 24px;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.modal header .time {
+  font-size: 16px;
+  color: #888;
+  margin: 0 0 0.5rem 0;
+}
+
+.modal video {
+  width: 100%;
+  height: auto;
+}

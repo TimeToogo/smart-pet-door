@@ -1,0 +1,127 @@
+<html>
+  <head>
+    <title>Pet Monitor</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <link rel="icon" href="static/favicon.png" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style/app.css" />
+    <script>
+      window.PetConfig = {
+        title: "Mia and Luna",
+        events: {
+          SIGHTING: 1,
+          WENT_INSIDE: 2,
+          WENT_OUTSIDE: 3,
+          HUNT: 4,
+          FIGHT: 5,
+          TOILET: 6,
+        },
+        pets: [
+          { id: 1, name: "Mia", avatar: "static/dog-head.jpg" },
+          { id: 2, name: "Luna", avatar: "static/cat-head.jpg" },
+        ],
+      };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.xkcd@1/dist/chart.xkcd.min.js"></script>
+    <script type="module" src="script/app.js"></script>
+  </head>
+  <body>
+    <header class="main-header">
+      <div class="title">
+        <script>
+          document.write(`<img src="${PetConfig.pets[0].avatar}" />`);
+        </script>
+        <h1>
+          <script>
+            document.write(PetConfig.title);
+          </script>
+        </h1>
+        <script>
+          document.write(`<img src="${PetConfig.pets[1].avatar}" />`);
+        </script>
+      </div>
+    </header>
+    <main>
+      <section class="timeline">
+        <header>
+          <h2>Events in the last 24 hours</h2>
+        </header>
+        <div class="container">
+          <div class="content">
+            <script class="render" type="module">
+              export default function (events) {
+                return `<ul>
+                    ${events
+                      .map(
+                        (i) => `<li>
+                        <div class="event">
+                            <img src="${i.frameUrl}" />
+                            <p class="title">${i.message}</p>
+                            <p class="time">${i.timeSince}</p>
+                        </div>
+                    </li>`
+                      )
+                      .join("")}
+                </ul>`;
+              }
+            </script>
+          </div>
+        </div>
+      </section>
+      <section class="sightings">
+        <header>
+          <h2>Latest sightings</h2>
+        </header>
+      </section>
+      <section class="in-vs-out">
+        <header>
+          <h2>Time spent inside vs outside</h2>
+        </header>
+      </section>
+      <section class="frequencies">
+        <header>
+          <h2>Occurrences</h2>
+        </header>
+      </section>
+    </main>
+    <div class="modal">
+      <div class="background"></div>
+      <div class="dialog">
+        <div class="close">&times;</div>
+        <div class="body">
+          <script class="render" type="module">
+            export default function (event) {
+              return `
+                        <header>
+                            <p class="title">${event.message}</p>
+                            <p class="time">${event.timeSince}</p>
+                        </header>
+                        <video controls autoplay src="${event.videoUrl}"></video>
+                    `;
+            }
+          </script>
+        </div>
+      </div>
+    </div>
+    <footer class="main-footer">
+      <p>
+        💖️ from
+        <script>
+          document.write(
+            PetConfig.pets
+              .slice(0, -1)
+              .map((i) => i.name)
+              .join(", ") +
+              " &amp; " +
+              PetConfig.pets[PetConfig.pets.length - 1].name
+          );
+        </script>
+        🐾
+      </p>
+    </footer>
+  </body>
+</html>

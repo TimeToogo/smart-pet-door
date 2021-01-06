@@ -1,0 +1,39 @@
+.main-header {
+    width: 100%;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.main-header .title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-header h1 {
+    font-size: 64px;
+    line-height: 64px;
+    margin: 0 1.5rem;
+    color: var(--white);
+    text-shadow: 5px 5px 0 var(--shadow);
+}
+
+.main-header img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    background-position: center;
+    border-radius: 99px;
+    border: 7px solid var(--white);
+    box-shadow: 5px 5px 0 var(--shadow);
+}
+
+@media (max-width: 640px) {
+    .main-header h1 {
+        font-size: 60px;
+        text-align: center;
+        margin: 0 0.75rem;
+        text-shadow: 4px 4px 0 var(--shadow);
+    }
+}
