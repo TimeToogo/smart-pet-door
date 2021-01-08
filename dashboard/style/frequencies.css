@@ -14,3 +14,9 @@
 .frequencies .chart {
   width: 100%;
 }
+
+@media (max-width: 640px) {
+  .frequencies .content {
+    padding: 0 0 4rem 0;
+  }
+}

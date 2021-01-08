@@ -84,7 +84,7 @@
                       (i) => `
                             <div class="sighting">
                                 <h3>${i.pet} was seen ${i.timeSince}</h3>
-                                <video controls src="${i.videoUrl}" />
+                                <video controls preload="metadata" poster="${i.frameUrl}" src="${i.videoUrl}#t=0.0001" />
                             </div>
                           `
                     )

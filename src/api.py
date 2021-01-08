@@ -18,7 +18,7 @@ app.mount("/", StaticFiles(directory="dashboard", html=True), name="dashboard")
 async def fulfil_http_range_header(request: Request, call_next):
     response = await call_next(request)
 
-    if 'range' in request.headers and isinstance(response, StreamingResponse):
+    if 'range' in request.headers and isinstance(response, StreamingResponse) and 'content-length' in response.headers:
 
         content_length = int(response.headers.get('content-length'))
 
@@ -30,7 +30,7 @@ async def fulfil_http_range_header(request: Request, call_next):
         range_end   = min(content_length - 1, int(range_end)) if range_end else content_length - 1
 
         response.body_iterator = yield_byte_range(response, response.body_iterator, range_start, range_end)
-        response.headers['content-range'] = f'bytes {range_start}-{range_end}/{content_length - 1}'
+        response.headers['content-range'] = f'bytes {range_start}-{range_end}/{content_length}'
         response.headers['content-length'] = str(range_end - range_start + 1)
         response.headers['Accept-Range'] = 'bytes'
         response.status_code = 206

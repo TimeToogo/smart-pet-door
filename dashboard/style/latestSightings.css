@@ -28,4 +28,12 @@
   border-radius: 10px;
   border: 7px solid var(--white);
   box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+  padding: 0;
+  object-fit: cover;
+}
+
+@media (max-width: 640px) {
+    .sightings .content .sighting {
+        margin: 1.5rem 0;
+    }
 }

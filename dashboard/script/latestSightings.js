@@ -20,6 +20,7 @@ export default class LatestSightings {
 
         return {
           pet: pet.name,
+          frameUrl: event.frameUrl,
           videoUrl: event.videoUrl,
           timeSince: timeago(event.recordedAt) + ' ago',
         };

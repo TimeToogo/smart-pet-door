@@ -11,15 +11,22 @@ export default class InVsOut {
 
     render(root.querySelector(".content"), [cfg.pets]);
 
+    const mobile = window.innerWidth < 640;
+
     let i = 0;
     for (const petEl of Array.from(root.querySelectorAll(".pet"))) {
       const pet = cfg.pets[i];
-      const [weeks, inside, outside] = InVsOut.calculate(cfg, pet, events);
+      const [weeks, inside, outside] = InVsOut.calculate(
+        cfg,
+        pet,
+        events,
+        mobile
+      );
 
       const chartEl = petEl.querySelector(".chart");
 
-      new chartXkcd.StackedBar(chartEl, {
-        xLabel: "Period",
+      const chart = new chartXkcd.StackedBar(chartEl, {
+        xLabel: mobile ? "Weeks ago" : "Period",
         yLabel: "Time (h)",
         data: {
           labels: weeks,
@@ -35,7 +42,8 @@ export default class InVsOut {
           ],
         },
         options: {
-          backgroundColor: "transparent",
+          showLegend: !mobile,
+          backgroundColor: "var(--background)",
           strokeColor: "var(--white)",
           dataColors: ["#94C5FA", "#6DFA97"].reverse(),
           legendPosition: chartXkcd.config.positionType.upRight,
@@ -45,7 +53,7 @@ export default class InVsOut {
     }
   }
 
-  static calculate(cfg, pet, events) {
+  static calculate(cfg, pet, events, mobile) {
     events = events.filter((i) => i.pets.includes(pet.id));
     events = events.filter(
       (i) =>
@@ -110,6 +118,10 @@ export default class InVsOut {
       weeks = weeks.slice(weeks.length - MAX_WEEKS);
       inside = inside.slice(inside.length - MAX_WEEKS);
       outside = outside.slice(outside.length - MAX_WEEKS);
+    }
+
+    if (mobile) {
+      weeks = Array.from(inside.keys()).reverse();
     }
 
     return [weeks, inside, outside];
