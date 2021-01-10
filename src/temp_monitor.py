@@ -33,7 +33,7 @@ def get_temp():
 def calc_range(temp):
     temp_range = TempRange.COOL
     
-    for range1, threshold in reversed(config.TM_THRESHOLDS_C.items()):
+    for range1, threshold in reversed(list(config.TM_THRESHOLDS_C.items())):
         if temp >= float(threshold):
             temp_range = range1
             break
