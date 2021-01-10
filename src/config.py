@@ -12,6 +12,16 @@ class State:
     TERMINATING = 2
     UPDATING = 3
 
+class TempRange:
+    COOL = 1
+    HOT = 2
+    VERY_HOT = 3
+    DANGEROUS = 4
+
+    @staticmethod
+    def name(temp_range: int) -> str:
+        return ['COOL', 'HOT', 'VERY_HOT', 'DANGEROUS'][temp_range - 1]
+
 class Config:
     # Motion Detection (MD) config
     MD_MIN_AREA = 100
@@ -29,6 +39,14 @@ class Config:
 
     # Auto Updater (AD) config
     AD_INTERVAL_S = 5 * 60
+
+    # Temp monitor (TM) config
+    TM_MEASURE_INTERVAL_S = 60
+    TM_THRESHOLDS_C = {
+        TempRange.HOT: 65,
+        TempRange.VERY_HOT: 72,
+        TempRange.DANGEROUS: 80
+    }
 
     # API
     API_BIND = "0.0.0.0:8080"

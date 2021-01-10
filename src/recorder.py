@@ -1,4 +1,4 @@
-from config import config
+from config import config, TempRange
 
 from imutils.video import VideoStream
 import datetime
@@ -11,7 +11,7 @@ import os
 import astral.sun
 from sys import platform
 
-def start_recorder(queue = None, debug = False):
+def start_recorder(queue = None, shared = {}, debug = False):
     vs = VideoStream(src=0, resolution=config.MD_RESOLUTION, usePiCamera='linux' in platform)
     vs_stream = vs.start()
 
@@ -96,6 +96,28 @@ def start_recorder(queue = None, debug = False):
         frameDelta = cv2.absdiff(compare_frame, gray)
         thresh = cv2.threshold(frameDelta, 50, 255, cv2.THRESH_BINARY)[1]
 
+        # sleep until next frame at desired FPS
+        # todo: this is not really tracking at the right fps since it does not account
+        # for processing time of each frame but is good for keeping a consistent cpu usage
+        # which helps with temperature management, this can be improved to calculate the time
+        # until the next frame and potentially slow if temp rises beyond a threshold 
+        def sleep_interval(state):
+            nonlocal shared
+
+            base_interval = 1 / (config.MD_STILL_FPS if state == "STILL" else config.MD_MOTION_FPS)
+
+            if 'temp' in shared and 'range' in shared['temp']:
+                r = shared['temp']['range']
+                if r == TempRange.HOT:
+                    base_interval *= 2
+                elif r == TempRange.VERY_HOT:
+                    base_interval *= 8
+                elif r == TempRange.DANGEROUS:
+                    config.logger.info('cpu is dangerously hot, sleeping for 60s')
+                    base_interval = 60
+            
+            return base_interval
+
         # dilate the thresholded image to fill in holes, then find contours
         # on thresholded image
         thresh = cv2.dilate(thresh, None, iterations=2)
@@ -156,12 +178,7 @@ def start_recorder(queue = None, debug = False):
         elif state == "MOTION":
             write_frame_to_video(video, orig_frame)
 
-        # sleep until next frame at desired FPS
-        # todo: this is not really tracking at the right fps since it does not account
-        # for processing time of each frame but is good for keeping a consistent cpu usage
-        # which helps with temperature management, this can be improved to calculate the time
-        # until the next frame and potentially slow if temp rises beyond a threshold 
-        sleep(1 / (config.MD_STILL_FPS if state == "STILL" else config.MD_MOTION_FPS))
+        sleep(sleep_interval(state))
 
         # keep previous frame for writing to video if motion occurs
         prev_frame = orig_frame

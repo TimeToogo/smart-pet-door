@@ -1,4 +1,4 @@
-from multiprocessing import Process, Queue, Value
+from multiprocessing import Process, Queue, Value, Manager
 from time import sleep
 import signal
 import sys
@@ -9,19 +9,23 @@ from config import config, State
 
 from recorder import start_recorder
 from processor import video_processor
+from temp_monitor import temp_monitor
 from auto_updater import auto_updater
 from api import api
 
 def start():
     config.logger.info('starting smart pet door app...')
 
+    manager = Manager()
     state = Value('i', State.ALIVE)
+    shared = manager.dict()
     video_queue = Queue()
 
     procs = []
 
-    procs.append(keep_alive('motion detection recorder', state, start_recorder, (video_queue,)))
-    procs.append(keep_alive('video processor', state, video_processor, (video_queue,)))
+    procs.append(keep_alive('motion detection recorder', state, start_recorder, (video_queue, shared)))
+    procs.append(keep_alive('video processor', state, video_processor, (video_queue, shared)))
+    procs.append(keep_alive('temp monitor', state, temp_monitor, (shared,)))
     procs.append(keep_alive('auto update', state, auto_updater, (state,)))
     procs.append(keep_alive('api', state, api, ()))
 
@@ -81,7 +85,7 @@ def manage_proc(name, state, function, args):
             if not proc.is_alive():
                 config.logger.info('[%s] process finished with code %d' % (name, proc.exitcode))
         except Exception as e:
-            config.logger.warning('[%s] process threw exception', exc_info=e)
+            config.logger.warning('[%s] process threw exception' % name, exc_info=e)
 
     if proc.is_alive():
         proc.terminate()
