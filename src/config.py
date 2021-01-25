@@ -41,10 +41,10 @@ class Config:
     AD_INTERVAL_S = 5 * 60
 
     # Temp monitor (TM) config
-    TM_MEASURE_INTERVAL_S = 60
+    TM_MEASURE_INTERVAL_S = 15
     TM_THRESHOLDS_C = {
-        TempRange.HOT: 65,
-        TempRange.VERY_HOT: 72,
+        TempRange.HOT: 60,
+        TempRange.VERY_HOT: 70,
         TempRange.DANGEROUS: 80
     }
 
