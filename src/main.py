@@ -10,6 +10,7 @@ from config import config, State
 from recorder import start_recorder
 from processor import video_processor
 from temp_monitor import temp_monitor
+from fan_controller import fan_controller
 from auto_updater import auto_updater
 from api import api
 
@@ -26,6 +27,7 @@ def start():
     procs.append(keep_alive('motion detection recorder', state, start_recorder, (video_queue, shared)))
     procs.append(keep_alive('video processor', state, video_processor, (video_queue, shared)))
     procs.append(keep_alive('temp monitor', state, temp_monitor, (shared,)))
+    procs.append(keep_alive('fan controller', state, fan_controller, (shared,)))
     procs.append(keep_alive('auto update', state, auto_updater, (state,)))
     procs.append(keep_alive('api', state, api, ()))
 

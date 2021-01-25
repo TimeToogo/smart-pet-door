@@ -1,6 +1,8 @@
 aiofiles==0.6.0
 astral==2.2
+colorzero==1.1
 fastapi==0.63.0
+gpiozero==1.5.1
 h11==0.12.0
 h2==4.0.0
 hpack==4.0.0

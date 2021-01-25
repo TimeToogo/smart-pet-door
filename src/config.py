@@ -48,8 +48,14 @@ class Config:
         TempRange.DANGEROUS: 80
     }
 
+    ## Fan Controller (FC) config
+    FC_GPIO_PIN = 16
+    FC_FAN_ON_THRESHOLD = TempRange.HOT
+    FC_UPDATE_INTERVAL_S = 15
+
     # API
     API_BIND = "0.0.0.0:8080"
+
 
     def __init__(self):
         self.logger = logging.getLogger('smartpetdoor')
