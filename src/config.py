@@ -50,7 +50,8 @@ class Config:
 
     ## Fan Controller (FC) config
     FC_GPIO_PIN = 16
-    FC_FAN_ON_THRESHOLD = TempRange.HOT
+    FC_FAN_ON_TEMP = 65
+    FC_FAN_OFF_TEMP = 50
     FC_UPDATE_INTERVAL_S = 15
 
     # API

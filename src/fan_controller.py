@@ -13,16 +13,20 @@ from sys import platform
 def fan_controller(shared):
 
     fan_pin = get_fan_controller_pin()
-    current_state = False
+    desired_state = False
+    sleep(1)
 
     try:
         while True:
-            if 'temp' in shared and 'range' in shared['temp']:
-                r = shared['temp']['range']
-                current_state = r >= config.FC_FAN_ON_THRESHOLD
+            if 'temp' in shared and 'c' in shared['temp']:
+                temp = shared['temp']['c']
+                if fan_pin.is_active:
+                    desired_state = temp > config.FC_FAN_OFF_TEMP
+                else:
+                    desired_state = temp >= config.FC_FAN_ON_TEMP
 
-            if current_state != fan_pin.is_active:
-                if current_state:
+            if desired_state != fan_pin.is_active:
+                if desired_state:
                     config.logger.info('cpu temp is above threshold, turning fan on')
                     fan_pin.on()
                 else:
@@ -44,4 +48,4 @@ def get_fan_controller_pin():
     return OutputDevice(pin=config.FC_GPIO_PIN, pin_factory=pin_factory)
 
 if __name__ == '__main__':
-    fan_controller({'temp': {'range': TempRange.HOT}})
+    fan_controller({'temp': {'c': 70}})
