@@ -48,7 +48,6 @@ def get_fan_controller_pin():
         config.logger.info('not running on pi, will use mock gpio pins')
         pin_factory = MockFactory()
         return OutputDevice(pin=config.FC_GPIO_PIN, pin_factory=pin_factory)
-        return
 
     return PWMOutputDevice(pin=config.FC_GPIO_PIN, frequency=config.FC_PWM_FREQ_HZ, pin_factory=pin_factory)
 

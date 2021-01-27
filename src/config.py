@@ -52,7 +52,7 @@ class Config:
     FC_GPIO_PIN = 21
     FC_FAN_MIN_TEMP = 50
     FC_PWM_MIN_VAL = 0.3
-    FC_FAN_MAX_TEMP = 70
+    FC_FAN_MAX_TEMP = 65
     FC_PWM_MAX_VAL = 1.0
     FC_PWM_FREQ_HZ = 25
     FC_UPDATE_INTERVAL_S = 15
