@@ -15,7 +15,7 @@ def start_recorder(queue = None, shared = {}, debug = False):
     vs = VideoStream(src=0, resolution=config.MD_RESOLUTION, usePiCamera='linux' in platform)
     vs_stream = vs.start()
 
-    sleep(2.0)
+    sleep(3.0)
 
     prev_frame = None
     compare_frame = None
