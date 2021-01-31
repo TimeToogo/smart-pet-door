@@ -48,7 +48,7 @@ class Config:
         TempRange.DANGEROUS: 80
     }
 
-    ## Fan Controller (FC) config
+    # Fan Controller (FC) config
     FC_GPIO_PIN = 21
     FC_FAN_MIN_TEMP = 50
     FC_PWM_MIN_VAL = 0.3
@@ -56,6 +56,25 @@ class Config:
     FC_PWM_MAX_VAL = 1.0
     FC_PWM_FREQ_HZ = 25
     FC_UPDATE_INTERVAL_S = 15
+
+    # Video Classification (VC) config
+    VC_INPUT_SHAPE = (15,64,64,1) # dims: frames, w, h, channels
+    VC_PET_CLASSES = {
+        'MIA': 1,
+        'LUNA': 2,
+        'OTHER': 3,
+        'NOT_PET': 4,
+    }
+    VC_EVENT_CLASSES = {
+        'SIGHTING': 1,
+        'WENT_INSIDE': 2,
+        'WENT_OUTSIDE': 3,
+        'HUNT': 4,
+        'FIGHT': 5,
+        'TOILET': 6,
+        'OTHER': 7,
+        'DISCARD': 8,
+    }
 
     # API
     API_BIND = "0.0.0.0:8080"

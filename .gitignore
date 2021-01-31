@@ -1,6 +1,8 @@
 .virtualenv/
+.virtualenv_dev/
 old/
 __pycache__
 data/
 *.log
 .DS_Store
+status.json
