@@ -1,13 +1,15 @@
 import os
+import sys
 import subprocess
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 from ..config import config
 
 MAX_FRAMES = config.VC_INPUT_SHAPE[0]
 FRAME_WIDTH = config.VC_INPUT_SHAPE[1]
 FRAME_HEIGHT = config.VC_INPUT_SHAPE[2]
-MIN_FRAME_INTERVAL = config.MD_MOTION_FPS # extract at most 1 fps
+MIN_FRAME_INTERVAL = math.floor(config.MD_MOTION_FPS / 3) # extract at most ~3 fps
 
 def preprocess_video(video_path: str):
     frames = get_frame_count(video_path)
@@ -72,5 +74,7 @@ def read_frames(video_path: str, frame_interval: int, frame_dims) -> bytes:
     return proc.stdout
 
 if __name__ == '__main__':
-    frames = preprocess_video('/Users/elliotlevin/Temp/motion/dataset/motion.2021-01-29T08-59-15.mp4')
+    frames = preprocess_video(sys.argv[1])
+    plt.imshow(frames.reshape(MAX_FRAMES * FRAME_HEIGHT, FRAME_WIDTH, 1))
+    plt.show()
     print(frames, frames.shape)
