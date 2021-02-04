@@ -25,7 +25,7 @@ def video_processor(queue, shared):
         pets, event = classify_video(video, model)
 
         if event == config.VC_EVENT_CLASSES['DISCARD']:
-            config.info.logger('video classified as DISCARD, ignoring...')
+            config.logger.info('video classified as DISCARD, ignoring...')
             continue
 
         video_file_name = link_to_pub_dir(video)
