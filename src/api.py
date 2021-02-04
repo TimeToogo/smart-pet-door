@@ -1,4 +1,7 @@
-from config import Config
+from config import config
+import db
+
+from datetime import datetime
 
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import StreamingResponse
@@ -6,10 +9,26 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-@app.get("/api/test")
-async def test_api():
-    return {"message": "Hello World"}
+dbcon = db.connect()
 
+@app.get("/api/events")
+async def get_events(since: datetime):
+    events = db.select_recent_events(dbcon, since)
+
+    api_events = [
+        {
+            'pets': e['pets'],
+            'event': e['event'],
+            'videoUrl': '/public/' + e['video_file_name'],
+            'frameUrl': '/public/' + e['frame_file_name'],
+            'recordedAt': e['timestamp'].isoformat()
+        }
+        for e in events
+    ]
+
+    return {'events': api_events}
+
+app.mount("/public/", StaticFiles(directory=config.VP_PUBLIC_DIR), name="public")
 app.mount("/", StaticFiles(directory="dashboard", html=True), name="dashboard")
 
 # Safari on iOS/Mac require servers to respect range headers for video
@@ -68,7 +87,7 @@ def api():
     from hypercorn.asyncio import serve
 
     hyp_config = HypConfig()
-    hyp_config.bind = [Config.API_BIND]
+    hyp_config.bind = [config.API_BIND]
 
     asyncio.run(serve(app, hyp_config))
 

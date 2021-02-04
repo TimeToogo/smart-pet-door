@@ -4,9 +4,9 @@ import json
 import random
 import tensorflow as tf
 import numpy as np
-from .model import VideoClassifierModel
-from .preprocess import preprocess_video
-from ..config import config
+from ml.model import VideoClassifierModel
+from ml.preprocess import preprocess_video
+from config import config
 
 if len(sys.argv) < 3:
     print('usage: python -msrc.ml.train [labels json file] [saved model dir]')
@@ -16,7 +16,7 @@ BATCH_SIZE = 8
 VAL_PORTION = 0.1
 TEST_PORTION = 0.1
 
-EPOCHS = 40
+EPOCHS = 30
 LEARNING_RATE = 1e-4
 
 class VideoDataSequence(tf.keras.utils.Sequence):

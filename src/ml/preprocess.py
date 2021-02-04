@@ -3,8 +3,7 @@ import sys
 import subprocess
 import math
 import numpy as np
-import matplotlib.pyplot as plt
-from ..config import config
+from config import config
 
 MAX_FRAMES = config.VC_INPUT_SHAPE[0]
 FRAME_WIDTH = config.VC_INPUT_SHAPE[1]
@@ -74,6 +73,8 @@ def read_frames(video_path: str, frame_interval: int, frame_dims) -> bytes:
     return proc.stdout
 
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+
     frames = preprocess_video(sys.argv[1])
     plt.imshow(frames.reshape(MAX_FRAMES * FRAME_HEIGHT, FRAME_WIDTH, 1))
     plt.show()

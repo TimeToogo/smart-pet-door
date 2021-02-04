@@ -79,6 +79,14 @@ class Config:
     # API
     API_BIND = "0.0.0.0:8080"
 
+    # Video Processor (VP)
+    VP_TFLITE_MODEL_PATH = "./data/model/model.tflite"
+    VP_PET_CLASS_THRESHOLD = 0.75
+    VP_FRAMES_DIR = './data/frames/'
+    VP_PUBLIC_DIR = './data/public/'
+
+    # Database
+    DB_SQLITE_PATH = "./data/db.sqlite"
 
     def __init__(self):
         self.logger = logging.getLogger('smartpetdoor')

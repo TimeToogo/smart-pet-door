@@ -1,7 +1,7 @@
 import sys
 import colorsys
-from .annotator import Annotator
-from ..config import config
+from ml.annotator import Annotator
+from config import config
 
 if len(sys.argv) < 3:
     print('usage: python -m src.ml.run_annotator [video dir] [out dir]')

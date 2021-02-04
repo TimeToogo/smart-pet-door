@@ -31,8 +31,8 @@ class VideoClassifierModel(tf.keras.Model):
         self.lstm = L.LSTM(32)
         self.dense1 = L.Dense(256, activation='relu')
         self.dropout1 = L.Dropout(0.5)
-        self.pet_class_output = L.Dense(len(config.VC_PET_CLASSES), activation='sigmoid')
-        self.event_class_output = L.Dense(len(config.VC_EVENT_CLASSES), activation='softmax')
+        self.pet_class_output = L.Dense(len(config.VC_PET_CLASSES), activation='sigmoid', name="output_pets")
+        self.event_class_output = L.Dense(len(config.VC_EVENT_CLASSES), activation='softmax', name="output_event")
     
     def call(self, inputs):
         x = inputs
