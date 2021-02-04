@@ -28,6 +28,10 @@ def video_processor(queue, shared):
             config.logger.info('video classified as DISCARD, ignoring...')
             continue
 
+        if len(pets) == 0:
+            config.logger.info('did not detect pets in video, ignoring...')
+            continue
+
         video_file_name = link_to_pub_dir(video)
         frame_file_path = generate_video_frame(video)
         frame_file_name = link_to_pub_dir(frame_file_path)
