@@ -2,9 +2,7 @@
 
 set -e
 
-echo "o: $0"
 DIR="$(dirname $(dirname $(realpath $0)))"
-echo "dir: $DIR"
 cd $DIR
 
 if [[ ! -e "$DIR/.virtualenv" ]];
