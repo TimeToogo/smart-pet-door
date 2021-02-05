@@ -19,7 +19,7 @@ then
     source $DIR/.virtualenv/bin/activate
 fi
 
-. $DIR/scripts/stop.sh
+$DIR/scripts/stop.sh
 
 echo "starting process..."
 python -m src.main > execution.log 2>&1 &
