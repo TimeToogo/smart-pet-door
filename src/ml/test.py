@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
     eval_data = {
         'MIA': '/Users/elliotlevin/Temp/motion/dataset/motion.2021-02-04T18-32-03.mp4',
+        'LUNA': '/Users/elliotlevin/Downloads/16cef8c3-76f1-40d9-acbd-228252695182.mp4',
         'DISCARD': '/Users/elliotlevin/Temp/motion/dataset/motion.2021-02-04T14-11-59.mp4'
     }
 

@@ -12,11 +12,11 @@ if len(sys.argv) < 3:
     print('usage: python -msrc.ml.train [labels json file] [saved model dir]')
     sys.exit(1)
 
-BATCH_SIZE = 8
+BATCH_SIZE = 1
 VAL_PORTION = 0.1
 TEST_PORTION = 0.1
 
-EPOCHS = 20
+EPOCHS = 40
 LEARNING_RATE = 1e-4
 
 class VideoDataSequence(tf.keras.utils.Sequence):
