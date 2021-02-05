@@ -16,7 +16,7 @@ BATCH_SIZE = 8
 VAL_PORTION = 0.1
 TEST_PORTION = 0.1
 
-EPOCHS = 30
+EPOCHS = 20
 LEARNING_RATE = 1e-4
 
 class VideoDataSequence(tf.keras.utils.Sequence):

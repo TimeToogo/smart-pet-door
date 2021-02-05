@@ -6,8 +6,9 @@ import numpy as np
 from ..config import config
 
 MAX_FRAMES = config.VC_INPUT_SHAPE[0]
-FRAME_WIDTH = config.VC_INPUT_SHAPE[1]
-FRAME_HEIGHT = config.VC_INPUT_SHAPE[2]
+FRAME_HEIGHT = config.VC_INPUT_SHAPE[1]
+FRAME_WIDTH = config.VC_INPUT_SHAPE[2]
+CHANNELS = config.VC_INPUT_SHAPE[3]
 MIN_FRAME_INTERVAL = math.floor(config.MD_MOTION_FPS / 3) # extract at most ~3 fps
 
 def preprocess_video(video_path: str):
@@ -19,11 +20,13 @@ def preprocess_video(video_path: str):
 
     frames_tensor = np.frombuffer(frames_buffer, dtype='uint8').astype('float32')
     frames_tensor = frames_tensor / 255
+
+    max_length = MAX_FRAMES * FRAME_WIDTH * FRAME_HEIGHT * CHANNELS
  
-    if len(frames_buffer) > MAX_FRAMES * FRAME_WIDTH * FRAME_HEIGHT:
-        frames_tensor = frames_tensor[:MAX_FRAMES * FRAME_WIDTH * FRAME_HEIGHT]
-    elif len(frames_buffer) < MAX_FRAMES * FRAME_WIDTH * FRAME_HEIGHT:
-        padding = MAX_FRAMES * FRAME_WIDTH * FRAME_HEIGHT - len(frames_buffer)
+    if len(frames_buffer) > max_length:
+        frames_tensor = frames_tensor[:max_length]
+    elif len(frames_buffer) < max_length:
+        padding = max_length - len(frames_buffer)
         frames_tensor = np.pad(frames_tensor, (0, padding))
 
     frames_tensor = np.reshape(frames_tensor, config.VC_INPUT_SHAPE)
@@ -64,7 +67,7 @@ def read_frames(video_path: str, frame_interval: int, frame_dims) -> bytes:
             '-vcodec',
             'rawvideo',
             '-pix_fmt',
-            'gray8',
+            'rgb24',
             '-',
         ],
         stdout=subprocess.PIPE
@@ -76,6 +79,6 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
     frames = preprocess_video(sys.argv[1])
-    plt.imshow(frames.reshape(MAX_FRAMES * FRAME_HEIGHT, FRAME_WIDTH, 1))
+    plt.imshow(frames.reshape(MAX_FRAMES * FRAME_HEIGHT, FRAME_WIDTH, CHANNELS))
     plt.show()
     print(frames, frames.shape)

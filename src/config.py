@@ -58,7 +58,7 @@ class Config:
     FC_UPDATE_INTERVAL_S = 15
 
     # Video Classification (VC) config
-    VC_INPUT_SHAPE = (15,64,64,1) # dims: frames, w, h, channels
+    VC_INPUT_SHAPE = (15,96,96,3) # dims: frames, w, h, channels
     VC_PET_CLASSES = {
         'MIA': 1,
         'LUNA': 2,

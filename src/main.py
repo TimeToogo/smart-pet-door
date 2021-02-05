@@ -46,11 +46,6 @@ def start():
         return exit_code
 
     def sigint_handler(sig, frame):
-        config.logger.info('found update, restarting process...')
-        wait_for_procs()
-        subprocess.Popen(['bash', './scripts/boot.sh'])
-        config.logger.info('terminating...')
-        sys.exit(0)
         config.logger.info('handling sigint, shutting down...')
         nonlocal state
 
