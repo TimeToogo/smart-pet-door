@@ -46,11 +46,12 @@ def start():
         return exit_code
 
     def sigint_handler(sig, frame):
+        nonlocal state
+
         if state.value == State.TERMINATING:
             return
         
         config.logger.info('handling sigint, shutting down...')
-        nonlocal state
 
         with state.get_lock():
             state.value = State.TERMINATING
