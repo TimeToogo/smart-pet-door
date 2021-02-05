@@ -9,11 +9,19 @@ from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-dbcon = db.connect()
+dbcon = None
+
+def get_dbcon():
+    global dbcon
+
+    if dbcon is None:
+        dbcon = db.connect()
+
+    return dbcon
 
 @app.get("/api/events")
 async def get_events(since: datetime):
-    events = db.select_recent_events(dbcon, since)
+    events = db.select_recent_events(get_dbcon(), since)
 
     api_events = [
         {

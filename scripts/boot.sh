@@ -19,6 +19,10 @@ then
     source $DIR/.virtualenv/bin/activate
 fi
 
+. stop.sh
+
 echo "starting process..."
 python -m src.main > execution.log 2>&1 &
+PID=$!
+echo "$PID" > main.pid
 exit 0
