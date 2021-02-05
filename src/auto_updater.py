@@ -3,7 +3,7 @@ import subprocess
 import os
 import sys
 
-from config import config, State
+from .config import config, State
 
 def auto_updater(state):
    while True:

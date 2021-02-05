@@ -3,7 +3,7 @@ import sys
 import subprocess
 import math
 import numpy as np
-from config import config
+from ..config import config
 
 MAX_FRAMES = config.VC_INPUT_SHAPE[0]
 FRAME_WIDTH = config.VC_INPUT_SHAPE[1]

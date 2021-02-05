@@ -5,14 +5,14 @@ import sys
 import os
 import subprocess
 
-from config import config, State
+from .config import config, State
 
-from recorder import start_recorder
-from processor import video_processor
-from temp_monitor import temp_monitor
-from fan_controller import fan_controller
-from auto_updater import auto_updater
-from api import api
+from .recorder import start_recorder
+from .processor import video_processor
+from .temp_monitor import temp_monitor
+from .fan_controller import fan_controller
+from .auto_updater import auto_updater
+from .api import api
 
 def start():
     config.logger.info('starting smart pet door app...')
@@ -46,6 +46,11 @@ def start():
         return exit_code
 
     def sigint_handler(sig, frame):
+        config.logger.info('found update, restarting process...')
+        wait_for_procs()
+        subprocess.Popen(['bash', './scripts/boot.sh'])
+        config.logger.info('terminating...')
+        sys.exit(0)
         config.logger.info('handling sigint, shutting down...')
         nonlocal state
 
@@ -62,10 +67,10 @@ def start():
 
     if state.value == State.TERMINATING:
         config.logger.info('finishing process...')
-    elif state.value == State.UPDATING:
+    elif state.value == State.UPDATING or 1:
         config.logger.info('found update, restarting process...')
         wait_for_procs()
-        subprocess.Popen([sys.executable] + sys.argv)
+        subprocess.Popen(['bash', './scripts/boot.sh'])
         config.logger.info('terminating...')
         sys.exit(0)
 

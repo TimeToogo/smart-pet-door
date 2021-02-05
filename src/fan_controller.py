@@ -2,11 +2,11 @@ from time import sleep
 import subprocess
 import os
 import sys
+from sys import platform
 
 from gpiozero import Device, PWMOutputDevice, OutputDevice
 
-from config import config, TempRange
-from sys import platform
+from .config import config, TempRange
 
 # Basic fan control using a GPIO pin (requires external circuitry)
 # see https://www.instructables.com/PWM-Regulated-Fan-Based-on-CPU-Temperature-for-Ras/

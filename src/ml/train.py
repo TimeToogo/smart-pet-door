@@ -4,9 +4,9 @@ import json
 import random
 import tensorflow as tf
 import numpy as np
-from ml.model import VideoClassifierModel
-from ml.preprocess import preprocess_video
-from config import config
+from .model import VideoClassifierModel
+from .preprocess import preprocess_video
+from ..config import config
 
 if len(sys.argv) < 3:
     print('usage: python -msrc.ml.train [labels json file] [saved model dir]')

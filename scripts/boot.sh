@@ -1,6 +1,10 @@
 #!/bin/bash
 
+set -e
+
+echo "o: $0"
 DIR="$(dirname $(dirname $(realpath $0)))"
+echo "dir: $DIR"
 cd $DIR
 
 if [[ ! -e "$DIR/.virtualenv" ]];
@@ -18,5 +22,5 @@ then
 fi
 
 echo "starting process..."
-python $DIR/src/main.py > execution.log 2>&1 &
+python -m src.main > execution.log 2>&1 &
 exit 0

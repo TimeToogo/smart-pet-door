@@ -1,6 +1,6 @@
 import sys
 import colorsys
-from ml.annotator import Annotator
+from .annotator import Annotator
 from config import config
 
 if len(sys.argv) < 3:

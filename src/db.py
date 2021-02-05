@@ -1,6 +1,6 @@
 import sqlite3
 from datetime import datetime
-from config import config
+from .config import config
 
 def connect():
     config.logger.info('connecting to sqlite db: %s' % config.DB_SQLITE_PATH)

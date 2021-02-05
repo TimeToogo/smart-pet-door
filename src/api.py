@@ -1,5 +1,5 @@
-from config import config
-import db
+from .config import config
+from . import db
 
 from datetime import datetime
 

@@ -2,9 +2,9 @@ from time import sleep
 import subprocess
 import os
 import sys
-
-from config import config, TempRange
 from sys import platform
+
+from .config import config, TempRange
 
 def temp_monitor(shared):
    while True:

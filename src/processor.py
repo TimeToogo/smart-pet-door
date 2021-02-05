@@ -7,9 +7,9 @@ import uuid
 import shutil
 from datetime import datetime
 
-from config import config
-from ml.preprocess import preprocess_video
-import db
+from .config import config
+from .ml.preprocess import preprocess_video
+from . import db
 
 def video_processor(queue, shared):
     model = load_tflite_model()
@@ -65,7 +65,8 @@ def classify_video(video_path: str, model):
     tensor_index = model.get_input_details()[0]['index']
 
     batched_shape = (1,) + config.VC_INPUT_SHAPE
-    model.set_tensor(input_details[0]['index'], model_input.reshape(batched_shape))
+    model_input = model_input.reshape(batched_shape)
+    model.set_tensor(input_details[0]['index'], model_input)
 
     model.invoke()
 
