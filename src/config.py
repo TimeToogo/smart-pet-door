@@ -1,6 +1,9 @@
 import logging
 import os
 from astral.geocoder import lookup, database
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
@@ -77,7 +80,9 @@ class Config:
     }
 
     # API
-    API_BIND = "0.0.0.0:8080"
+    API_BIND_ADDR = os.getenv("API_BIND_ADDR")
+    API_TLS_CERT_PATH = os.getenv("API_TLS_CERT_PATH")
+    API_TLS_KEY_PATH = os.getenv("API_TLS_KEY_PATH")
 
     # Video Processor (VP)
     VP_TFLITE_MODEL_PATH = "./data/model/model.tflite"

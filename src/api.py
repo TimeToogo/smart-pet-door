@@ -95,7 +95,9 @@ def api():
     from hypercorn.asyncio import serve
 
     hyp_config = HypConfig()
-    hyp_config.bind = [config.API_BIND]
+    hyp_config.bind = [config.API_BIND_ADDR]
+    hyp_config.certfile = config.API_TLS_CERT_PATH or None
+    hyp_config.keyfile = config.API_TLS_KEY_PATH or None
 
     asyncio.run(serve(app, hyp_config))
 
