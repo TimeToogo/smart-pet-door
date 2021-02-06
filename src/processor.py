@@ -9,6 +9,7 @@ from datetime import datetime
 
 from .config import config
 from .ml.preprocess import preprocess_video
+from .ml.class_map import class_map
 from . import db
 
 def video_processor(queue, shared):
@@ -22,14 +23,10 @@ def video_processor(queue, shared):
         video = queue.get(block=True)
         config.logger.info('received video %s for processing' % video)
 
-        pets, event = classify_video(video, model)
+        pet, event = classify_video(video, model)
 
-        if event == config.VC_EVENT_CLASSES['DISCARD']:
+        if not pet or not event:
             config.logger.info('video classified as DISCARD, ignoring...')
-            continue
-
-        if len(pets) == 0:
-            config.logger.info('did not detect pets in video, ignoring...')
             continue
 
         video_file_name = link_to_pub_dir(video)
@@ -38,7 +35,7 @@ def video_processor(queue, shared):
 
         db.insert_event(dbcon, {
             'timestamp': datetime.now(),
-            'pets': pets,
+            'pets': [pet],
             'event': event,
             'video_file_name': video_file_name,
             'frame_file_name': frame_file_name
@@ -71,26 +68,21 @@ def classify_video(video_path: str, model):
     model.invoke()
 
     output_details = model.get_output_details()
-    pet_index = next(x['index'] for x in output_details if x['shape'][1] == len(config.VC_PET_CLASSES))
-    event_index = next(x['index'] for x in output_details if x['shape'][1] == len(config.VC_EVENT_CLASSES))
-    pet_results = model.get_tensor(pet_index)
-    event_results = model.get_tensor(event_index)
+    prediction = model.get_tensor(output_details[0]['index'])
 
-    pet_class_indexes = [k for k, x in enumerate(pet_results[0].tolist()) if x > config.VP_PET_CLASS_THRESHOLD]
-    event_class_index = np.argmax(event_results[0]).tolist()
+    class_prediction = np.argmax(prediction[0])
 
-    all_pet_classes = list(config.VC_PET_CLASSES.items())
-    all_event_classes = list(config.VC_EVENT_CLASSES.items())
+    if class_map[class_prediction] == 'DISCARD':
+        return (None, None)
+
+    pet_class, event_class = class_map[class_prediction]
     
-    pet_str = ", ".join([all_pet_classes[x][0] for x in pet_class_indexes])
-    event_str = all_event_classes[event_class_index][0]
+    pet_str = ", ".join([pet_str for pet_str, _class in config.VC_PET_CLASSES.items() if _class == pet_class])
+    event_str = ", ".join([event_str for event_str, _class in config.VC_EVENT_CLASSES.items() if _class == pet_class])
 
     config.logger.info('detected pets [%s] in event [%s]' % (pet_str, event_str))
 
-    pet_classes = [all_pet_classes[x][1] for x in pet_class_indexes]
-    event_class = all_event_classes[event_class_index][1]
-
-    return pet_classes, event_class
+    return pet_class, event_class
 
 def generate_video_frame(video_path):
     file_name = os.path.basename(video_path)[:-4]

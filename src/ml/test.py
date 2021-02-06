@@ -49,11 +49,8 @@ if __name__ == '__main__':
         tflite_model.invoke()
 
         output_details = tflite_model.get_output_details()
-        pet_index = next(x['index'] for x in output_details if x['shape'][1] == len(config.VC_PET_CLASSES))
-        event_index = next(x['index'] for x in output_details if x['shape'][1] == len(config.VC_EVENT_CLASSES))
-        pet_results = tflite_model.get_tensor(pet_index)
-        event_results = tflite_model.get_tensor(event_index)
+        results = tflite_model.get_tensor(output_details[0]['index'])
 
-        print('tflite output:', [pet_results[0], event_results[0]])
+        print('tflite output:', results)
 
     

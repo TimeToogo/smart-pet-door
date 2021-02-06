@@ -66,7 +66,6 @@ class Config:
         'MIA': 1,
         'LUNA': 2,
         'OTHER': 3,
-        'NOT_PET': 4,
     }
     VC_EVENT_CLASSES = {
         'SIGHTING': 1,
@@ -76,7 +75,6 @@ class Config:
         'FIGHT': 5,
         'TOILET': 6,
         'OTHER': 7,
-        'DISCARD': 8,
     }
 
     # API

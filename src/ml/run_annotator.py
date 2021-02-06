@@ -18,30 +18,21 @@ def rgb(h, s, l):
     return (int(r * 255), int(g * 255), int(b * 255))
 
 for key, _class in config.VC_PET_CLASSES.items():
-    if key == 'NOT_PET':
-        continue
-    
     l = 50
     for ekey, eclass in config.VC_EVENT_CLASSES.items():
-        if ekey == 'DISCARD':
-            continue
-
         l += 10
         labels.append({'name': key + '_' + ekey, 'color': rgb(h, s, l)})
     h += 40
 
 key, _class = next(iter(config.VC_PET_CLASSES.items()))
 for okey, oclass in config.VC_PET_CLASSES.items():
-    if okey == key or okey == "NOT_PET":
+    if okey == key:
         continue
 
     pets = key + '_' + okey
     h += 20
     l = 20
     for ekey, eclass in config.VC_EVENT_CLASSES.items():
-        if ekey == 'DISCARD':
-            continue
-
         l += 10
         labels.append({'name': pets + '_' + ekey, 'color': rgb(h, s, l)})
 

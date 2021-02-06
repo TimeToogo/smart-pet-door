@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers as L
 from ..config import config
+from .class_map import class_map
 
 class VideoClassifierModel(tf.keras.Model):
     def __init__(self):
@@ -18,8 +19,7 @@ class VideoClassifierModel(tf.keras.Model):
         self.lstm = L.LSTM(32)
         self.dense1 = L.Dense(256, activation='relu')
         self.dropout1 = L.Dropout(0.5)
-        self.pet_class_output = L.Dense(len(config.VC_PET_CLASSES), activation='sigmoid', name="output_pets")
-        self.event_class_output = L.Dense(len(config.VC_EVENT_CLASSES), activation='softmax', name="output_event")
+        self.event_class_output = L.Dense(len(class_map), activation='softmax', name="output_event")
     
     def call(self, inputs):
         x = inputs
@@ -28,15 +28,15 @@ class VideoClassifierModel(tf.keras.Model):
         x = self.lstm(x)
         x = self.dense1(x)
         x = self.dropout1(x)
-        pets = self.pet_class_output(x)
         event = self.event_class_output(x)
 
-        return pets, event
+        return event
 
     def model(self, input_shape):
         x = tf.keras.Input(shape=input_shape)
         return tf.keras.Model(inputs=[x], outputs=self.call(x))
 
+                
 if __name__ == '__main__':
     model = VideoClassifierModel().model(config.VC_INPUT_SHAPE)
 

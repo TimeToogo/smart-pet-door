@@ -7,12 +7,13 @@ import numpy as np
 from .model import VideoClassifierModel
 from .preprocess import preprocess_video
 from ..config import config
+from .class_map import reverse_class_map
 
 if len(sys.argv) < 3:
     print('usage: python -msrc.ml.train [labels json file] [saved model dir]')
     sys.exit(1)
 
-BATCH_SIZE = 1
+BATCH_SIZE = 4
 VAL_PORTION = 0.1
 TEST_PORTION = 0.1
 
@@ -35,37 +36,40 @@ class VideoDataSequence(tf.keras.utils.Sequence):
         batch = self.labelled_vids[idx * self.batch_size:(idx + 1) * self.batch_size]
 
         batch_x = []
-        batch_y_pets = []
-        batch_y_event = []
+        batch_y = []
 
         for item in batch:
             batch_x.append(preprocess_video(item['video']))
-            pets, event = self.parse_label(item['label'])
-            batch_y_pets.append(pets)
-            batch_y_event.append(event)
+            one_hot_class = self.parse_label(item['label'])
+            batch_y.append(one_hot_class)
 
-        item = (np.array(batch_x), (np.array(batch_y_pets), np.array(batch_y_event)))
+        item = (np.array(batch_x), (np.array(batch_y)))
         self.cache[idx] = item
 
         return item
 
     def parse_label(self, label):
-        pets = np.zeros(len(config.VC_PET_CLASSES), dtype='float32')
-        event = np.zeros(len(config.VC_EVENT_CLASSES), dtype='float32')
+        one_hot_class = np.zeros(len(reverse_class_map), dtype='float32')
 
         if label == 'DISCARD':
-            pets[config.VC_PET_CLASSES['NOT_PET'] - 1] = 1.0
-            event[config.VC_EVENT_CLASSES['DISCARD'] - 1] = 1.0
+            one_hot_class[reverse_class_map['DISCARD']] = 1.0
         else:
+            pet_class = None
+
             for pet, _class in config.VC_PET_CLASSES.items():
                 if pet in label:
-                    pets[_class - 1] = 1.0
-                
+                    pet_class = _class
+                    break
+
+            event_class = None
             for _event, _class in config.VC_EVENT_CLASSES.items():
                 if label.endswith('_' + _event):
-                    event[_class - 1] = 1.0
+                    event_class = _class
+                    break
 
-        return (pets, event)
+            one_hot_class[reverse_class_map[str(pet_class) + '_' + str(event_class)]] = 1.0
+            
+        return one_hot_class
         
 def load_dataset(json_path):
     print('loading dataset from %s' % json_path)
@@ -107,7 +111,7 @@ def train_model(dataset):
     print('loading model')
     model = VideoClassifierModel()
 
-    model.compile(optimizer=tf.keras.optimizers.Adam(LEARNING_RATE), loss=['categorical_crossentropy'] * 2, metrics=['accuracy'])
+    model.compile(optimizer=tf.keras.optimizers.Adam(LEARNING_RATE), loss=['categorical_crossentropy'], metrics=['accuracy'])
     
     print('training model')
     model.fit(dataset['train'], validation_data=dataset['val'], epochs=EPOCHS)
