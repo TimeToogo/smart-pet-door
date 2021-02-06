@@ -62,6 +62,7 @@ class Config:
 
     # Video Classification (VC) config
     VC_INPUT_SHAPE = (15,96,96,3) # dims: frames, w, h, channels
+    VC_PREPROCESS_CACHE_PATH = './data/cache/'
     VC_PET_CLASSES = {
         'MIA': 1,
         'LUNA': 2,
@@ -86,7 +87,6 @@ class Config:
 
     # Video Processor (VP)
     VP_TFLITE_MODEL_PATH = "./data/model/model.tflite"
-    VP_PET_CLASS_THRESHOLD = 0.75
     VP_FRAMES_DIR = './data/frames/'
     VP_PUBLIC_DIR = './data/public/'
 

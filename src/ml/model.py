@@ -7,27 +7,52 @@ class VideoClassifierModel(tf.keras.Model):
     def __init__(self):
         super().__init__()
 
-        self.td_mobile_net = L.TimeDistributed(tf.keras.applications.MobileNetV2(
+        self.mobile_net = tf.keras.applications.MobileNetV2(
             input_shape=config.VC_INPUT_SHAPE[-3:],
             alpha=0.35,
             include_top=False,
             weights='imagenet'
-        ), name='time_distributed_mobile_net')
-        self.td_mobile_net.trainable = False
+        )
 
-        self.flatten = L.Reshape((config.VC_INPUT_SHAPE[0], -1))
-        self.lstm = L.LSTM(32)
-        self.dense1 = L.Dense(256, activation='relu')
-        self.dropout1 = L.Dropout(0.5)
+        # for layer in self.mobile_net.layers:
+        #     if 'block_16' in layer.name:
+        #         break
+
+        #     layer.trainable = False
+
+        self.td_mobile_net = L.TimeDistributed(self.mobile_net, name='time_distributed_mobile_net')
+        self.td_mobile_net.trainable = False
+        
+
+        self.flatten1 = L.Reshape((config.VC_INPUT_SHAPE[0], -1))
+
+        self.dropout1 = L.Dropout(0.15)
+
+        self.td_dense = L.Dense(32, activation='relu')
+        self.batch_norm1 = L.BatchNormalization()
+        self.dropout2 = L.Dropout(0.15)
+
+        self.flatten2 = L.Reshape((-1,))
+
+        # self.dense2 = L.Dense(32, activation='relu')
+        # self.batch_norm2 = L.BatchNormalization()
+        # self.dropout3 = L.Dropout(0.25)
+
         self.event_class_output = L.Dense(len(class_map), activation='softmax', name="output_event")
     
     def call(self, inputs):
         x = inputs
         x = self.td_mobile_net(x)
-        x = self.flatten(x)
-        x = self.lstm(x)
-        x = self.dense1(x)
-        x = self.dropout1(x)
+
+        # x = self.dropout1(x)
+        x = self.flatten1(x)
+
+        x = self.td_dense(x)
+        x = self.batch_norm1(x)
+        # x = self.dropout2(x)
+
+        x = self.flatten2(x)
+
         event = self.event_class_output(x)
 
         return event

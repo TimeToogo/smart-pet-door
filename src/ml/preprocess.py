@@ -11,7 +11,14 @@ FRAME_WIDTH = config.VC_INPUT_SHAPE[2]
 CHANNELS = config.VC_INPUT_SHAPE[3]
 MIN_FRAME_INTERVAL = math.floor(config.MD_MOTION_FPS / 3) # extract at most ~3 fps
 
-def preprocess_video(video_path: str):
+def preprocess_video(video_path: str, cache=False):
+    cache_file = get_cache_file_path(video_path)
+
+    if cache and os.path.isfile(cache_file):
+        with open(cache_file, 'rb') as file:
+            cached_tensor = np.frombuffer(file.read(), dtype='float32')
+            return np.reshape(cached_tensor, config.VC_INPUT_SHAPE)
+
     frames = get_frame_count(video_path)
     
     frame_interval = max(MIN_FRAME_INTERVAL, 0 if frames <= MAX_FRAMES else math.floor(frames / MAX_FRAMES))
@@ -31,7 +38,17 @@ def preprocess_video(video_path: str):
 
     frames_tensor = np.reshape(frames_tensor, config.VC_INPUT_SHAPE)
 
+    if cache:
+        os.makedirs(config.VC_PREPROCESS_CACHE_PATH, exist_ok=True)
+        with open(cache_file, 'wb') as file:
+            file.write(frames_tensor.tobytes())
+
     return frames_tensor
+
+def get_cache_file_path(video_path: str) -> str:
+    file_name = os.path.basename(video_path)
+
+    return os.path.realpath(config.VC_PREPROCESS_CACHE_PATH + '/preprocessed-' + file_name + '.tensor')
 
 def get_frame_count(video_path: str) -> int:
     proc = subprocess.run([
@@ -78,7 +95,7 @@ def read_frames(video_path: str, frame_interval: int, frame_dims) -> bytes:
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
 
-    frames = preprocess_video(sys.argv[1])
+    frames = preprocess_video(sys.argv[1], cache=True)
     plt.imshow(frames.reshape(MAX_FRAMES * FRAME_HEIGHT, FRAME_WIDTH, CHANNELS))
     plt.show()
     print(frames, frames.shape)

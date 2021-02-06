@@ -33,7 +33,6 @@ def create_class_map():
         else:
             reverse_class_map['_'.join(map(str, config_classes))] = model_class
 
-    print(reverse_class_map)
     return class_map, reverse_class_map
 
 class_map, reverse_class_map = create_class_map()
