@@ -83,6 +83,8 @@ class Config:
     API_BIND_ADDR = os.getenv("API_BIND_ADDR")
     API_TLS_CERT_PATH = os.getenv("API_TLS_CERT_PATH")
     API_TLS_KEY_PATH = os.getenv("API_TLS_KEY_PATH")
+    API_BASIC_USER = os.getenv("API_BASIC_USER")
+    API_BASIC_PASS = os.getenv("API_BASIC_PASS")
 
     # Video Processor (VP)
     VP_TFLITE_MODEL_PATH = "./data/model/model.tflite"

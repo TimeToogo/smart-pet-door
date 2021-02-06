@@ -1,9 +1,11 @@
 from .config import config
 from . import db
 
+import secrets
+import base64
 from datetime import datetime
 
-from fastapi import FastAPI, Request, Response
+from fastapi import FastAPI, Request, Response, HTTPException, status
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -64,6 +66,29 @@ async def fulfil_http_range_header(request: Request, call_next):
 
     return response
 
+@app.middleware("http")
+async def check_basic_auth(request: Request, call_next):
+    if not config.API_BASIC_USER and not config.API_BASIC_PASS:
+        return await call_next(request)
+    
+    correct_username = False
+    correct_password = False
+
+    if 'authorization' in request.headers and request.headers['authorization'].startswith('Basic '):
+        username, password = base64.b64decode(request.headers['authorization'][len('Basic '):]).decode('utf8').split(':')
+
+        correct_username = secrets.compare_digest(config.API_BASIC_USER, username)
+        correct_password = secrets.compare_digest(config.API_BASIC_PASS, password)
+
+    if not (correct_username and correct_password):
+        return Response(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            content="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    
+    return await call_next(request)
+    
 async def yield_byte_range(response, inner_gen, offset_start, offset_end):
     curr_offset = 0
     async for chunk in inner_gen:
