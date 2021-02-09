@@ -1,4 +1,5 @@
 import sys
+import os
 import math
 import json
 import random
@@ -14,7 +15,7 @@ if len(sys.argv) < 3:
     print('usage: python -msrc.ml.train [labels json file] [saved model dir]')
     sys.exit(1)
 
-EPOCHS = 40
+EPOCHS = 60
 LEARNING_RATE = 1e-4
 
 def train_model(dataset):
@@ -34,10 +35,13 @@ def train_model(dataset):
 def save_model(model, path):
     print('saving model to %s' % path)
 
-    model.save(path + '/saved_model/')
+    os.makedirs(path, exist_ok=True)
+    model.save_weights(path + '/saved_model.h5')
 
     print('creating tflite model')
-    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    unbatched_model = VideoClassifierModel().model(config.VC_INPUT_SHAPE)
+    unbatched_model.set_weights(model.get_weights())
+    converter = tf.lite.TFLiteConverter.from_keras_model(unbatched_model)
     tflite_model = converter.convert()
 
     with open(path + '/model.tflite', 'wb') as f:

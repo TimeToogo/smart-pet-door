@@ -6,12 +6,15 @@ import random
 import tensorflow as tf
 import numpy as np
 from .preprocess import preprocess_video
+from .model import VideoClassifierModel
 from ..config import config
 
 def load_keras_model():
-    model_path = os.path.dirname(config.VP_TFLITE_MODEL_PATH) + '/saved_model'
+    model_path = os.path.dirname(config.VP_TFLITE_MODEL_PATH) + '/saved_model.h5'
     config.logger.info('loading keras model from %s' % model_path)
-    model = tf.keras.models.load_model(model_path)
+    model = VideoClassifierModel()
+    model.build((1,) + config.VC_INPUT_SHAPE)
+    model.load_weights(model_path)
 
     return model
 
@@ -40,7 +43,6 @@ if __name__ == '__main__':
         video = video.reshape((1,) + video.shape)
 
         print('keras output:', keras_model.predict(video))
-
 
         input_details = tflite_model.get_input_details()
         tensor_index = tflite_model.get_input_details()[0]['index']
