@@ -14,29 +14,20 @@ class VideoClassifierModel(tf.keras.Model):
             weights='imagenet'
         )
 
-        # for layer in self.mobile_net.layers:
-        #     if 'block_16' in layer.name:
-        #         break
-
-        #     layer.trainable = False
-
         self.td_mobile_net = L.TimeDistributed(self.mobile_net, name='time_distributed_mobile_net')
         self.td_mobile_net.trainable = False
         
-
         self.flatten1 = L.Reshape((config.VC_INPUT_SHAPE[0], -1))
 
-        self.dropout1 = L.Dropout(0.15)
-
-        self.td_dense = L.Dense(32, activation='relu')
+        self.key_feature_extractor = L.TimeDistributed(L.Dense(16,  activation='relu'))
         self.batch_norm1 = L.BatchNormalization()
-        self.dropout2 = L.Dropout(0.15)
+        self.dropout1 = L.Dropout(0.25)
+
+        self.dense = L.Dense(32, activation='relu')
+        self.batch_norm2 = L.BatchNormalization()
+        self.dropout2 = L.Dropout(0.25)
 
         self.flatten2 = L.Reshape((-1,))
-
-        # self.dense2 = L.Dense(32, activation='relu')
-        # self.batch_norm2 = L.BatchNormalization()
-        # self.dropout3 = L.Dropout(0.25)
 
         self.event_class_output = L.Dense(len(class_map), activation='softmax', name="output_event")
     
@@ -44,12 +35,14 @@ class VideoClassifierModel(tf.keras.Model):
         x = inputs
         x = self.td_mobile_net(x)
 
-        # x = self.dropout1(x)
+        x = self.key_feature_extractor(x)
+        x = self.batch_norm1(x)
+        x = self.dropout1(x)
         x = self.flatten1(x)
 
-        x = self.td_dense(x)
-        x = self.batch_norm1(x)
-        # x = self.dropout2(x)
+        x = self.dense(x)
+        x = self.batch_norm2(x)
+        x = self.dropout2(x)
 
         x = self.flatten2(x)
 

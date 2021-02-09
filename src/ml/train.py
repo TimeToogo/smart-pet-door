@@ -14,7 +14,7 @@ if len(sys.argv) < 3:
     print('usage: python -msrc.ml.train [labels json file] [saved model dir]')
     sys.exit(1)
 
-EPOCHS = 30
+EPOCHS = 40
 LEARNING_RATE = 1e-4
 
 def train_model(dataset):

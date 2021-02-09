@@ -71,14 +71,14 @@ async def check_basic_auth(request: Request, call_next):
     if not config.API_BASIC_USER and not config.API_BASIC_PASS:
         return await call_next(request)
     
-    correct_username = False
-    correct_password = False
+    username = None
+    password = None
 
     if 'authorization' in request.headers and request.headers['authorization'].startswith('Basic '):
         username, password = base64.b64decode(request.headers['authorization'][len('Basic '):]).decode('utf8').split(':')
 
-        correct_username = secrets.compare_digest(config.API_BASIC_USER, username)
-        correct_password = secrets.compare_digest(config.API_BASIC_PASS, password)
+    correct_username = username and secrets.compare_digest(config.API_BASIC_USER, username)
+    correct_password = password and secrets.compare_digest(config.API_BASIC_PASS, password)
 
     if not (correct_username and correct_password):
         return Response(
