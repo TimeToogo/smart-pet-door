@@ -9,7 +9,7 @@ class VideoClassifierModel(tf.keras.Model):
 
         self.mobile_net = tf.keras.applications.MobileNetV2(
             input_shape=config.VC_INPUT_SHAPE[-3:],
-            alpha=0.35,
+            alpha=0.50,
             include_top=False,
             weights='imagenet'
         )
@@ -19,13 +19,13 @@ class VideoClassifierModel(tf.keras.Model):
         
         self.flatten1 = L.Reshape((config.VC_INPUT_SHAPE[0], -1))
 
-        self.key_feature_extractor = L.TimeDistributed(L.Dense(16,  activation='relu'))
+        self.key_feature_extractor = L.TimeDistributed(L.Dense(64,  activation='relu'))
         self.batch_norm1 = L.BatchNormalization()
-        self.dropout1 = L.Dropout(0.25)
+        self.dropout1 = L.Dropout(0.20)
 
         self.dense = L.Dense(32, activation='relu')
         self.batch_norm2 = L.BatchNormalization()
-        self.dropout2 = L.Dropout(0.25)
+        self.dropout2 = L.Dropout(0.20)
 
         self.flatten2 = L.Reshape((-1,))
 

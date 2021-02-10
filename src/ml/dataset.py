@@ -6,6 +6,9 @@ import random
 import tensorflow as tf
 import numpy as np
 import pprint
+from concurrent.futures import ThreadPoolExecutor
+from multiprocessing import Queue
+from time import sleep
 from .model import VideoClassifierModel
 from .preprocess import preprocess_video
 from ..config import config
@@ -14,7 +17,7 @@ from .class_map import reverse_class_map
 VAL_PORTION = 0.1
 TEST_PORTION = 0.1
 BATCH_SIZE = 32
-DATA_GENERATOR_VARIATIONS = 5
+ITEMS_PER_CLASS = 1000
 
 class VideoDataSequence(tf.keras.utils.Sequence):
     def __init__(self, labelled_vids, batch_size, datagen = False):
@@ -22,7 +25,7 @@ class VideoDataSequence(tf.keras.utils.Sequence):
         self.batch_size = batch_size
         self.cache = {}
 
-        if datagen and DATA_GENERATOR_VARIATIONS:
+        if datagen and ITEMS_PER_CLASS:
             self.datagen = tf.keras.preprocessing.image.ImageDataGenerator(
                 rotation_range=15,
                 width_shift_range=0.1,
@@ -35,8 +38,81 @@ class VideoDataSequence(tf.keras.utils.Sequence):
                 horizontal_flip=True,
                 vertical_flip=False,
             )
+            self.master_pool = ThreadPoolExecutor(max_workers=1)
+            self.outstanding_threads = 0
+            self.pool = ThreadPoolExecutor(max_workers=batch_size * 2)
+            self.queue = Queue(batch_size * 10)
+            self.balanced_labels = self.gen_balanced_data()
+            self.master_pool.submit(self.gen_vids_bg)
+            self.qsize = 0
+            self.vid_cache = {}
         else:
             self.datagen = None
+
+    def gen_balanced_data(self):
+        grouped_by_class = {}
+        balanced_labels = []
+
+        for item in self.labelled_vids:
+            if not item['label'] in grouped_by_class:
+                grouped_by_class[item['label']] = []
+            
+            grouped_by_class[item['label']].append(item)
+
+        for _class, items in grouped_by_class.items():
+            variations_per_item = math.ceil(ITEMS_PER_CLASS / len(items))
+
+            class_items = []
+            for item in items:
+                for i in range(variations_per_item):
+                    transform = {'transform': i > 0}
+                    class_items.append({**item, **transform})
+
+                    if len(class_items) == ITEMS_PER_CLASS:
+                        break
+            
+                if len(class_items) == ITEMS_PER_CLASS:
+                    break
+
+            for i in class_items:
+                balanced_labels.append(i)
+
+        random.Random(1).shuffle(balanced_labels)
+
+        return balanced_labels
+
+    def gen_vids_bg(self):
+        try:
+            while True:
+                for idx in range(len(self)):
+                    batch = self.balanced_labels[idx * self.batch_size:(idx + 1) * self.batch_size]
+
+                    for item in batch:
+                        self.pool.submit(self.gen_vid, item, self.datagen)
+                        self.outstanding_threads += 1
+                        while self.queue.full() or self.outstanding_threads > self.batch_size * 2:
+                            sleep(0.01)
+        except Exception as e:
+            print(e)
+
+    def gen_vid(self, item, datagen):
+        if not item['video'] in self.vid_cache:
+            self.vid_cache[item['video']] = preprocess_video(item['video'], cache=True).copy()
+
+        vid = self.vid_cache[item['video']].copy()
+
+        if item['transform']:
+            transform = datagen.get_random_transform(vid.shape[1:])
+
+            frames, frame_h = vid.shape[:2]
+            for f in range(frames - 1):
+                vid[f:f+1] = datagen.apply_transform(vid[f:f+1].reshape(vid.shape[1:]), transform)
+
+            vid = vid / 255
+
+        self.queue.put((vid, item['label']))
+        self.outstanding_threads -= 1
+        self.qsize += 1
 
     def genvids(self, amt, idx):
         vids = []
@@ -49,38 +125,15 @@ class VideoDataSequence(tf.keras.utils.Sequence):
             
             return vids
         
-        vid_index = math.floor(idx * self.batch_size / (1 + DATA_GENERATOR_VARIATIONS))
-        variations_gen_index = (idx * self.batch_size) % (1 + DATA_GENERATOR_VARIATIONS)
-
-        while len(vids) < amt:
-            item = self.labelled_vids[vid_index]
-
-            while variations_gen_index < DATA_GENERATOR_VARIATIONS + 1:
-                vid = preprocess_video(item['video'], cache=True).copy()
-
-                if variations_gen_index > 0:
-                    transform = self.datagen.get_random_transform(vid.shape[1:])
-
-                    frames, frame_h = vid.shape[:2]
-                    for f in range(frames - 1):
-                        vid[f:f+1] = self.datagen.apply_transform(vid[f:f+1].reshape(vid.shape[1:]), transform)
-
-                    vid = vid / 255
-
-                vids.append((vid, item['label']))
-                variations_gen_index += 1
-
-                if len(vids) == amt:
-                    return vids
-
-            vid_index = vid_index + 1 if vid_index < len(self.labelled_vids) - 1 else 0
-            variations_gen_index = 0
+        for i in range(amt):
+            vids.append(self.queue.get(block=True))
+            self.qsize -= 1
 
         return vids
 
     def __len__(self):
         if self.datagen:
-            return math.floor(len(self.labelled_vids) * (1 + DATA_GENERATOR_VARIATIONS) / self.batch_size)
+            return math.ceil(len(self.balanced_labels) / self.batch_size)
         else:
             return math.ceil(len(self.labelled_vids) / self.batch_size)
 
@@ -171,9 +224,13 @@ if __name__ == '__main__':
     dataset = load_dataset(sys.argv[1])
 
     if len(sys.argv) <= 2:
+        counts = np.zeros((len(reverse_class_map,)))
         for batch_x, batch_y in dataset['train']:
             plt.figure()
-            f, axrr = plt.subplots(1, len(batch_x))
-            for k, item in enumerate(batch_x):
-                axrr[k].imshow(item.reshape((-1,) + item.shape[-2:]))
-            plt.show()
+            f, axrr = plt.subplots(1, 8)
+            counts[:np.max(np.argmax(batch_y, axis=1)) + 1] += np.bincount(np.argmax(batch_y, axis=1))
+            print(counts)
+            # for k in range(min(8, len(batch_x))):
+            #     axrr[k].imshow(batch_x[k].reshape((-1,) + batch_x[k].shape[-2:]))
+            
+            # plt.show()
