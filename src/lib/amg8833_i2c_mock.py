@@ -5,4 +5,4 @@ class AMG8833:
         pass
 
     def read_temp(self):
-        return False, np.random.uniform(0.0, 4.0, (8,8))
+        return False, np.random.uniform(0.0, 20.0, (8,8))

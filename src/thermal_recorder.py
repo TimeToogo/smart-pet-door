@@ -34,10 +34,12 @@ def start_thermal_recorder(queue = None, shared = {}, debug = False):
         video_path = config.TC_STORAGE_PATH + '/thermal.' + datetime.datetime.now().strftime('%Y-%m-%dT%H-%M-%S') + '.avi'  
         config.logger.info('writing video to %s' % video_path)
         fourcc = cv2.VideoWriter_fourcc(*'XVID')
-        video = cv2.VideoWriter(video_path, fourcc, config.TC_MOTION_FPS, config.TC_RESOLUTION, isColor=False)
+        video = cv2.VideoWriter(video_path, fourcc, config.TC_MOTION_FPS, config.TC_RESOLUTION)
         return video, video_path
 
     def write_frame_to_video(video, frame):
+        frame = frame.reshape(config.TC_RESOLUTION + (1,))
+        frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         video.write(frame)
 
     def end_video(video, video_path):
