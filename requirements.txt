@@ -19,4 +19,4 @@ starlette==0.13.6
 tflite-runtime==2.5.0
 toml==0.10.2
 wsproto==1.0.0
-smbus=1.1.post2
+smbus==1.1.post2
