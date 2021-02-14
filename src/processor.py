@@ -23,6 +23,10 @@ def video_processor(queue, shared):
         video = queue.get(block=True)
         config.logger.info('received video %s for processing' % video)
 
+        if video.endswith('.avi'):
+            config.logger.info('converting avi to mp4')
+            video = convert_video_to_mp4(video)
+
         pet, event = classify_video(video, model)
 
         if not pet or not event:
@@ -42,6 +46,15 @@ def video_processor(queue, shared):
         })
 
         config.logger.info('finished processing %s' % video)
+
+def convert_video_to_mp4(video_path):
+    mp4_path = video_path.replace('.avi', '.mp4')
+    os.system('ffmpeg -hide_banner -loglevel error -y -threads %d -i %s -vcodec libx264 -movflags +faststart %s' 
+        % (config.VP_FFMPEG_THREADS, video_path, mp4_path))
+    config.logger.info('finished converting video to mp4 at %s' % mp4_path)
+    os.remove(video_path)
+
+    return mp4_path
 
 def load_tflite_model():
     config.logger.info('loading tflite model from %s' % config.VP_TFLITE_MODEL_PATH)

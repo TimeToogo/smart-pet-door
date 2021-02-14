@@ -89,6 +89,7 @@ class Config:
     VP_TFLITE_MODEL_PATH = "./data/model/model.tflite"
     VP_FRAMES_DIR = './data/frames/'
     VP_PUBLIC_DIR = './data/public/'
+    VP_FFMPEG_THREADS = 1
 
     # Database
     DB_SQLITE_PATH = "./data/db.sqlite"

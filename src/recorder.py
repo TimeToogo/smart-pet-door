@@ -42,12 +42,7 @@ def start_recorder(queue = None, shared = {}, debug = False):
 
     def end_video(video, video_path):
         video.release()
-        mp4_path = video_path.replace('.avi', '.mp4')
         config.logger.info('finished writing to video')
-        os.system('ffmpeg -hide_banner -loglevel error -i %s -vcodec libx264 -movflags +faststart %s' % (video_path, mp4_path))
-        config.logger.info('finished converting video to mp4 at %s' % mp4_path)
-        os.remove(video_path)
-        return mp4_path
 
     def calc_brightness(cache = {}):
         now = datetime.datetime.now(config.MD_LOCATION_INFO.tzinfo)
@@ -130,7 +125,7 @@ def start_recorder(queue = None, shared = {}, debug = False):
 
         def end_motion():
             nonlocal state, state_change_at, compare_frame, video, video_path
-            video_path = end_video(video, video_path)
+            end_video(video, video_path)
 
             if queue is not None:
                 queue.put(video_path)

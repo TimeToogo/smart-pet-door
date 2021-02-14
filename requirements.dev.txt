@@ -55,6 +55,7 @@ tensorboard-plugin-wit==1.8.0
 tensorflow==2.4.1
 tensorflow-estimator==2.4.0
 termcolor==1.1.0
+tflite-runtime==2.5.0
 toml==0.10.2
 tqdm==4.56.0
 typing-extensions==3.7.4.3
