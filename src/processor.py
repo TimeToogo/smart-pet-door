@@ -37,8 +37,8 @@ def video_processor(queue, shared):
             config.logger.info('video classified as DISCARD, ignoring...')
             continue
 
-        video_file_name = link_to_pub_dir(video)
-        frame_file_path = generate_video_frame(video)
+        video_file_name = link_to_pub_dir(video['path'])
+        frame_file_path = generate_video_frame(video['path'])
         frame_file_name = link_to_pub_dir(frame_file_path)
 
         db.insert_event(dbcon, {
@@ -70,7 +70,7 @@ def load_tflite_model():
 
 def classify_video(video_path: str, model):
     config.logger.info('preprocessing video %s' % video_path)
-    model_input = preprocess_video(video_path)
+    model_input = preprocess_video(video_path, ffmpeg_threads=config.VP_FFMPEG_THREADS)
     config.logger.info('preprocessed video')
     
     config.logger.info('classifying %s' % video_path)
@@ -111,6 +111,8 @@ def generate_video_frame(video_path):
         'ffmpeg',
         '-v',
         'error',
+        '-threads',
+        str(config.VP_FFMPEG_THREADS),
         '-i',
         video_path,
         '-vf', 
