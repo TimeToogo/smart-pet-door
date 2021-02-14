@@ -27,7 +27,7 @@ class TempRange:
 
 class Config:
     # Motion Detection (MD) config
-    MD_CHANGE_THRESHOLD = 0.05
+    MD_CHANGE_THRESHOLD = 0.025
     MD_RESIZE_WIDTH = 240
     MD_RESOLUTION = (640, 480)
     MD_MIN_DURATION_S = 5
