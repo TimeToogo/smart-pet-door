@@ -27,12 +27,12 @@ class TempRange:
 
 class Config:
     # Motion Detection (MD) config
-    MD_MIN_AREA = 100
+    MD_CHANGE_THRESHOLD = 0.05
     MD_RESIZE_WIDTH = 240
     MD_RESOLUTION = (640, 480)
     MD_MIN_DURATION_S = 5
     MD_MAX_DURATION_S = 60
-    MD_STILL_FPS = 1
+    MD_STILL_FPS = 3
     MD_MOTION_FPS = 10
     MD_STORAGE_PATH = "data/video"
     MD_STORAGE_MAX_AGE = 30 * 24 * 3600

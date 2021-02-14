@@ -84,7 +84,7 @@ def start_recorder(queue = None, shared = {}, debug = False):
 
         # resize the frame, convert it to grayscale, and blur it
         orig_frame = frame
-        frame = imutils.resize(frame, width=config.MD_RESIZE_WIDTH)
+        frame = imutils.resize(frame, width=config.MD_RESIZE_WIDTH, inter=cv2.INTER_NEAREST)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         gray = cv2.GaussianBlur(gray, (21, 21), 0)
 
@@ -118,27 +118,11 @@ def start_recorder(queue = None, shared = {}, debug = False):
             
             return base_interval
 
-        # dilate the thresholded image to fill in holes, then find contours
-        # on thresholded image
-        thresh = cv2.dilate(thresh, None, iterations=2)
-        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-            cv2.CHAIN_APPROX_SIMPLE)
-        cnts = imutils.grab_contours(cnts)
-
         # loop over the contours
-        detected_motion = False
-        for c in cnts:
-            # if the contour is too small, ignore it
-            if cv2.contourArea(c) < config.MD_MIN_AREA:
-                continue
+        amount_changed = np.count_nonzero(thresh) / thresh.size
+        detected_motion = amount_changed > config.MD_CHANGE_THRESHOLD
 
-            if debug:
-                # compute the bounding box for the contour, draw it on the frame,
-                # and update the text
-                (x, y, w, h) = cv2.boundingRect(c)
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-            detected_motion = True
+        if detected_motion:
             last_motion_at = time()
 
         motion_duration = time() - state_change_at if state_change_at else 0
@@ -210,4 +194,5 @@ def start_recorder(queue = None, shared = {}, debug = False):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    start_recorder(debug=True)
+    print('pid: ', os.getpid())
+    start_recorder(debug=False)
