@@ -8,6 +8,7 @@ import subprocess
 from .config import config, State
 
 from .recorder import start_recorder
+from .thermal_recorder import start_thermal_recorder
 from .processor import video_processor
 from .temp_monitor import temp_monitor
 from .fan_controller import fan_controller
@@ -25,6 +26,8 @@ def start():
     procs = []
 
     procs.append(keep_alive('motion detection recorder', state, start_recorder, (video_queue, shared)))
+    if config.TC_ENABLED:
+        procs.append(keep_alive('thermal camera recorder', state, start_thermal_recorder, (video_queue, shared)))
     procs.append(keep_alive('video processor', state, video_processor, (video_queue, shared)))
     procs.append(keep_alive('temp monitor', state, temp_monitor, (shared,)))
     procs.append(keep_alive('fan controller', state, fan_controller, (shared,)))

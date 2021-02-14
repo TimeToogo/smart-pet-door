@@ -28,19 +28,33 @@ class TempRange:
 class Config:
     # Motion Detection (MD) config
     MD_DAY_PIXEL_CHANGE_THRESHOLD = 50
-    MD_NIGH_PIXEL_CHANGE_THRESHOLD = 15
+    MD_NIGHT_PIXEL_CHANGE_THRESHOLD = 15
     MD_IMAGE_CHANGE_THRESHOLD = 0.02
     MD_RESIZE_WIDTH = 240
     MD_RESOLUTION = (640, 480)
     MD_MIN_DURATION_S = 5
     MD_MAX_DURATION_S = 60
-    MD_STILL_FPS = 3
+    MD_STILL_FPS = 2
     MD_MOTION_FPS = 10
     MD_STORAGE_PATH = "data/video"
     MD_STORAGE_MAX_AGE = 30 * 24 * 3600
     MD_DAY_BRIGHTNESS = 50
     MD_NIGHT_BRIGHTNESS = 65
     MD_LOCATION_INFO = lookup("Melbourne", database())
+
+    # Thermal Camera (TC) config
+    TC_ENABLED = True
+    TC_ADDR = 0x69
+    TC_MIN_TEMP_C = 0
+    TC_MAX_TEMP_C = 50
+    TC_CHANGE_TEMP_PIXEL_THRESHOLD = 2
+    TC_CHANGE_TEMP_IMAGE_THRESHOLD_PIXELS = 4
+    TC_STORAGE_PATH = "data/video/ir"
+    TC_RESOLUTION = (8, 8)
+    TC_MIN_DURATION_S = 1
+    TC_MAX_DURATION_S = 10
+    TC_STILL_FPS = 2
+    TC_MOTION_FPS = 10
 
     # Auto Updater (AD) config
     AD_INTERVAL_S = 5 * 60

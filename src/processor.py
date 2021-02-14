@@ -23,11 +23,15 @@ def video_processor(queue, shared):
         video = queue.get(block=True)
         config.logger.info('received video %s for processing' % video)
 
-        if video.endswith('.avi'):
+        if video['path'].endswith('.avi'):
             config.logger.info('converting avi to mp4')
-            video = convert_video_to_mp4(video)
+            video['path'] = convert_video_to_mp4(video['path'])
 
-        pet, event = classify_video(video, model)
+        if video['type'] != 'motion':
+            config.logger.info('video type is %s, not processing' % video['type'])
+            continue
+
+        pet, event = classify_video(video['path'], model)
 
         if not pet or not event:
             config.logger.info('video classified as DISCARD, ignoring...')
@@ -133,5 +137,5 @@ def link_to_pub_dir(path):
 
 if __name__ == '__main__':
     queue = Queue()
-    queue.put('/Users/elliotlevin/Temp/motion/dataset/motion.2021-02-04T18-32-03.mp4')
+    queue.put({'type': 'motion', 'path': '/Users/elliotlevin/Temp/motion/dataset/motion.2021-02-04T18-32-03.mp4'})
     video_processor(queue, {})

@@ -138,7 +138,7 @@ def start_recorder(queue = None, shared = {}, debug = False):
             end_video(video, video_path)
 
             if queue is not None:
-                queue.put(video_path)
+                queue.put({'type': 'motion', 'path': video_path})
 
             state = "STILL"
             state_change_at = time()
