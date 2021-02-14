@@ -91,6 +91,10 @@ def start_recorder(queue = None, shared = {}, debug = False):
         frameDelta = cv2.absdiff(compare_frame, gray)
         thresh = cv2.threshold(frameDelta, 50, 255, cv2.THRESH_BINARY)[1]
 
+        # calculate portion of pixels that changed
+        amount_changed = np.count_nonzero(thresh) / thresh.size
+        detected_motion = amount_changed > config.MD_CHANGE_THRESHOLD
+
         # sleep until next frame at desired FPS
         # todo: this is not really tracking at the right fps since it does not account
         # for processing time of each frame but is good for keeping a consistent cpu usage
@@ -113,9 +117,6 @@ def start_recorder(queue = None, shared = {}, debug = False):
             
             return base_interval
 
-        # loop over the contours
-        amount_changed = np.count_nonzero(thresh) / thresh.size
-        detected_motion = amount_changed > config.MD_CHANGE_THRESHOLD
 
         if detected_motion:
             last_motion_at = time()
