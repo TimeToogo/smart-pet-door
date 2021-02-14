@@ -65,7 +65,7 @@ def start_recorder(queue = None, shared = {}, debug = False):
         if is_day():
             return config.MD_DAY_PIXEL_CHANGE_THRESHOLD
         else:
-            return config.MD_NIGH_PIXEL_CHANGE_THRESHOLD
+            return config.MD_NIGHT_PIXEL_CHANGE_THRESHOLD
 
     # set initial brightness and sleep to avoid brightness flicker triggering motion detection
     if hasattr(vs.stream, 'camera'):
