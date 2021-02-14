@@ -12,7 +12,6 @@ import astral.sun
 from sys import platform
 
 def start_thermal_recorder(queue = None, shared = {}, debug = False):
-
     thermal_cam = AMG8833(addr=config.TC_ADDR)
 
     sleep(3.0)
@@ -49,7 +48,7 @@ def start_thermal_recorder(queue = None, shared = {}, debug = False):
         # clip to min-max values
         frame = np.clip(frame, config.TC_MIN_TEMP_C, config.TC_MAX_TEMP_C)
         # normalise to 0-255 range
-        frame = (frame - config.TC_MIN_TEMP_C) / (config.TC_MAX_TEMP_C - config.TC_MIN_TEMP_C)
+        frame = (frame - config.TC_MIN_TEMP_C) / (config.TC_MAX_TEMP_C - config.TC_MIN_TEMP_C) * 255
         frame = frame.astype('uint8')
 
         return frame
