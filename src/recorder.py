@@ -43,8 +43,8 @@ def start_recorder(queue = None, shared = {}, debug = False):
     def end_video(video, video_path):
         video.release()
         config.logger.info('finished writing to video')
-
-    def calc_brightness(cache = {}):
+        
+    def is_day(cache = {}):
         now = datetime.datetime.now(config.MD_LOCATION_INFO.tzinfo)
         
         if 'day' not in cache or cache['day'] != now.date():
@@ -53,10 +53,19 @@ def start_recorder(queue = None, shared = {}, debug = False):
             cache['sunset'] = astral.sun.sunset(config.MD_LOCATION_INFO.observer, tzinfo=config.MD_LOCATION_INFO.tzinfo)
             config.logger.info('calculated sunrise and sunset: ' + str(cache))
 
-        if now > cache['sunrise'] and now < cache['sunset']:
+        return now > cache['sunrise'] and now < cache['sunset']
+
+    def calc_brightness():
+        if is_day():
             return config.MD_DAY_BRIGHTNESS
         else:
             return config.MD_NIGHT_BRIGHTNESS
+
+    def get_pixel_change_threshold():
+        if is_day():
+            return config.MD_DAY_PIXEL_CHANGE_THRESHOLD
+        else:
+            return config.MD_NIGH_PIXEL_CHANGE_THRESHOLD
 
     # set initial brightness and sleep to avoid brightness flicker triggering motion detection
     if hasattr(vs.stream, 'camera'):
@@ -89,11 +98,11 @@ def start_recorder(queue = None, shared = {}, debug = False):
             continue
 
         frameDelta = cv2.absdiff(compare_frame, gray)
-        thresh = cv2.threshold(frameDelta, 50, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.threshold(frameDelta, get_pixel_change_threshold(), 255, cv2.THRESH_BINARY)[1]
 
         # calculate portion of pixels that changed
         amount_changed = np.count_nonzero(thresh) / thresh.size
-        detected_motion = amount_changed > config.MD_CHANGE_THRESHOLD
+        detected_motion = amount_changed > config.MD_IMAGE_CHANGE_THRESHOLD
 
         # sleep until next frame at desired FPS
         # todo: this is not really tracking at the right fps since it does not account
@@ -191,4 +200,4 @@ def start_recorder(queue = None, shared = {}, debug = False):
 
 if __name__ == '__main__':
     print('pid: ', os.getpid())
-    start_recorder(debug=False)
+    start_recorder(debug=True)
