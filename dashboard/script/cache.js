@@ -30,7 +30,7 @@ const set = (events) => {
 
 const prePersist = (event) => ({
   ...event,
-  recordedAt: recordedAt.toISOString(),
+  recordedAt: event.recordedAt.toISOString(),
 });
 
 export default { get, set, clear };
