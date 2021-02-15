@@ -44,7 +44,7 @@ def select_recent_events(connection, since):
 
     return [
         {
-            'timestamp': datetime.strptime(r[0], "%Y-%m-%dT%H:%M:%S.%f"),
+            'timestamp': datetime.strptime(r[0], "%Y-%m-%dT%H:%M:%S.%f%z"),
             'pets': [int(x) for x in r[1].split(',')],
             'event': int(r[2]),
             'video_file_name': r[3],
