@@ -5,7 +5,7 @@ import subprocess
 import os
 import uuid
 import shutil
-from datetime import datetime
+from datetime import datetime, timezone
 
 from .config import config
 from .ml.preprocess import preprocess_video
@@ -42,7 +42,7 @@ def video_processor(queue, shared):
         frame_file_name = link_to_pub_dir(frame_file_path)
 
         db.insert_event(dbcon, {
-            'timestamp': datetime.now(),
+            'timestamp': datetime.utcnow().replace(tzinfo=timezone.utc),
             'pets': [pet],
             'event': event,
             'video_file_name': video_file_name,

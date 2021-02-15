@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from .config import config
 
 def connect():
@@ -22,7 +22,7 @@ def insert_event(connection, event):
     config.logger.info('inserting event into db')
 
     connection.execute('''INSERT INTO pet_door_events VALUES (?, ?, ?, ?, ?)''', (
-        event['timestamp'].isoformat(),
+        event['timestamp'].astimezone(tz=timezone.utc).isoformat(),
         ','.join([str(x) for x in event['pets']]),
         event['event'],
         event['video_file_name'],
@@ -38,7 +38,7 @@ def select_recent_events(connection, since):
         SELECT * FROM pet_door_events 
         WHERE timestamp >= ?
         ORDER BY timestamp DESC
-    ''', (since.isoformat(), ))
+    ''', (since.astimezone(tz=timezone.utc).isoformat(), ))
 
     rows = cursor.fetchall()
 
