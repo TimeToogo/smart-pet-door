@@ -18,13 +18,12 @@ const init = async () => {
   let events = cache.get()
 
   let latestEventDate = events.length
-   ? new Date(Math.max(...events.map(i => i.recordedAt.getTime())))
+   ? new Date(Math.max(...events.map(i => i.recordedAt.getTime())) + 1000)
    : new Date(Date.now() - 30 * 24 * 3600 * 1000);
 
   events = events.concat(await api.getEvents(latestEventDate))
 
   cache.set(events)
-
 
   timeline.init(cfg, events);
   latestSightings.init(cfg, events);
