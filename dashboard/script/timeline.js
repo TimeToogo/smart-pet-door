@@ -19,7 +19,7 @@ export default class Timeline {
     events = events.map((i) => ({
       frameUrl: i.frameUrl,
       videoUrl: i.videoUrl,
-      message: Timeline.renderMessage(cfg, i),
+      message: Timeline.renderMessage(cfg, i, idPetMap),
       timeSince: timeago(i.recordedAt) + " ago",
     }));
 
@@ -35,7 +35,7 @@ export default class Timeline {
     }
   }
 
-  static renderMessage(cfg, e) {
+  static renderMessage(cfg, e, idPetMap) {
     const pets = e.pets
       .map(id => idPetMap[id] ? idPetMap[id].name : 'A stranger');
 
