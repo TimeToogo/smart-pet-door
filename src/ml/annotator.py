@@ -117,15 +117,11 @@ class Annotator:
     def find_videos(self):
         '''Loop over the video folder looking for video files'''
         videos_list = []
-        for folder, _, files in tqdm(os.walk(self.videos_folder)):
-            # Sort the files in each folder
-            if self.sort_files_list:
-                files = sorted(files)
+        for file in tqdm(sorted(os.listdir(self.videos_folder))):
             # Loop over the files
-            for file in files:
-                fullfile_path = os.path.join(folder, file)
-                if os.path.splitext(fullfile_path)[1] in self.video_ext:
-                    videos_list.append(os.path.join(folder, file))
+            fullfile_path = os.path.join(self.videos_folder, file)
+            if os.path.splitext(fullfile_path)[1] in self.video_ext:
+                videos_list.append(os.path.join(self.videos_folder, file))
                     
         return videos_list
 
