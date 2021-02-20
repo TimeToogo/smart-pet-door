@@ -9,6 +9,11 @@ export default class Timeline {
     const root = document.querySelector(".timeline");
     const MIN_TIME = new Date(Date.now() - 86400 * 1000);
 
+    const idPetMap = {};
+    for (const pet of cfg.pets) {
+      idPetMap[pet.id] = pet
+    }
+
     events = events.filter((i) => i.recordedAt > MIN_TIME);
     events = events.sort((a, b) => b.recordedAt - a.recordedAt);
     events = events.map((i) => ({
@@ -31,13 +36,13 @@ export default class Timeline {
   }
 
   static renderMessage(cfg, e) {
-    const pets = cfg.pets
-      .filter((i) => e.pets.includes(i.id))
-      .map((i) => i.name);
+    const pets = e.pets
+      .map(id => idPetMap[id] ? idPetMap[id].name : 'A stranger');
+
     const names =
       pets.length === 1
         ? pets[0]
-        : pets.slice(0, -1).join(", ") + " & " + pets[pets.length - 1];
+        : (pets.slice(0, -1).join(", ") + " & " + pets[pets.length - 1]);
 
     const was = pets.length === 1 ? "was" : "were";
 
